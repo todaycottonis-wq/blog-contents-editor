@@ -138,6 +138,8 @@ input,select{font:inherit;color:inherit}
 .prof{display:flex;align-items:center;gap:20px;padding-bottom:24px;border-bottom:1.5px solid #ececee}
 .av{width:90px;height:90px;border-radius:50%;background:#e8e8ec;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none}
 .av svg{width:66px;height:66px;fill:#b8b8c2}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.page.edit .av{cursor:pointer}
 .pm{flex:1;min-width:0}
 .pn{font-size:29px;color:#777;letter-spacing:-.4px;line-height:1.3}
 .pt{font-size:23px;color:#a8a8b0;letter-spacing:-.2px;line-height:1.4}
@@ -354,7 +356,7 @@ function blockEl(b,mode){
   }else if(b.type==='divider'){
     const d=document.createElement('div');d.className='divl';d.style.height=s.th+'px';d.style.background=s.color;el.appendChild(d);
   }else if(b.type==='profile'){
-    el.innerHTML='<div class="prof"><div class="av">'+IC.person+'</div><div class="pm"><div class="pn">'+esc(b.nickname)+'</div><div class="pt">'+esc(b.timeLabel)+'</div></div>'+(b.showStats?'<div class="pst">'+IC.chart+'통계</div>':'')+'<div class="dots"><i></i><i></i><i></i></div></div>';
+    el.innerHTML='<div class="prof"><div class="av" data-av="'+b.id+'">'+(b.avatarId&&assets[b.avatarId]?'<img src="'+assets[b.avatarId]+'" alt="">':IC.person)+'</div><div class="pm"><div class="pn">'+esc(b.nickname)+'</div><div class="pt">'+esc(b.timeLabel)+'</div></div>'+(b.showStats?'<div class="pst">'+IC.chart+'통계</div>':'')+'<div class="dots"><i></i><i></i><i></i></div></div>';
   }
   return el;
 }
@@ -456,7 +458,9 @@ function dividerPanel(b){
 }
 function profilePanel(b){
   const s=rs(b);
+  const hasAv=b.avatarId&&assets[b.avatarId];
   return sec('프로필',blockActions()+'<div style="height:12px"></div>'+
+    '<button class="wide" data-do="pick-av">'+(hasAv?'프로필 사진 교체':'프로필 사진 선택')+'</button>'+(hasAv?'<div style="height:8px"></div><button class="wide" data-do="clear-av">프로필 사진 지우기</button>':'')+'<div style="height:12px"></div>'+
     row('닉네임','<input type="text" data-s="blk" data-k="nickname" value="'+esc(b.nickname)+'">')+
     row('시간','<input type="text" data-s="blk" data-k="timeLabel" value="'+esc(b.timeLabel)+'">')+
     row('통계','<label><input type="checkbox" data-s="blk" data-k="showStats"'+(b.showStats?' checked':'')+'> 통계 버튼 표시</label>')+
@@ -519,7 +523,7 @@ function snap(){
   st.hist=st.hist.slice(0,st.hi+1);st.hist.push(s);if(st.hist.length>100)st.hist.shift();st.hi=st.hist.length-1;updUndo();
 }
 function setSaved(ok,pending){const e=$('#saved');e.className='saved'+(ok?'':' warn');e.textContent=pending?'저장 중…':ok?'저장됨 ✓':'저장 공간 부족 — 파일로 저장하세요'}
-function usedAssets(){const used=new Set(),a={};doc.pages.forEach(p=>p.blocks.forEach(b=>b.assetId&&used.add(b.assetId)));used.forEach(id=>{if(assets[id])a[id]=assets[id]});return a}
+function usedAssets(){const used=new Set(),a={};doc.pages.forEach(p=>p.blocks.forEach(b=>(b.assetId&&used.add(b.assetId),b.avatarId&&used.add(b.avatarId))));used.forEach(id=>{if(assets[id])a[id]=assets[id]});return a}
 function save(){try{localStorage.setItem(KEY,JSON.stringify({doc,assets:usedAssets()}));setSaved(true)}catch(e){setSaved(false)}}
 const dSnap=debounce(snap,350),dSave=debounce(save,700),dThumb=debounce(renderThumbs,300);
 function changed(){setSaved(true,true);dSnap();dSave();dThumb();checkOverflowLive()}
@@ -545,6 +549,8 @@ scaler.addEventListener('input',e=>{
 scaler.addEventListener('click',e=>{
   const box=e.target.closest('.imgbox');
   if(box&&e.target.closest('.ph')){const f=findBlock(box.dataset.img);if(f)pickImage(f.b)}
+  const av=e.target.closest('.av');
+  if(av){const f=findBlock(av.dataset.av);if(f)pickImage(f.b,'avatarId')}
 });
 scaler.addEventListener('dragover',e=>{const box=e.target.closest('.imgbox');if(box&&[...e.dataTransfer.types].includes('Files')){e.preventDefault();box.classList.add('drop')}});
 scaler.addEventListener('dragleave',e=>{const box=e.target.closest('.imgbox');box&&box.classList.remove('drop')});
@@ -577,10 +583,10 @@ $('#panel').addEventListener('input',e=>{
 });
 
 /* ---------- 이미지 ---------- */
-const fimg=$('#fimg');let imgTarget=null;
-function pickImage(b){imgTarget=b;fimg.value='';fimg.click()}
-fimg.addEventListener('change',()=>{const f=fimg.files[0];if(f&&imgTarget)setImage(f,imgTarget)});
-function setImage(file,b){
+const fimg=$('#fimg');let imgTarget=null,imgKey='assetId';
+function pickImage(b,k){imgTarget=b;imgKey=k||'assetId';fimg.value='';fimg.click()}
+fimg.addEventListener('change',()=>{const f=fimg.files[0];if(f&&imgTarget)setImage(f,imgTarget,imgKey)});
+function setImage(file,b,key){key=key||'assetId';
   if(!file||!/^image\/(png|jpeg|webp)$/.test(file.type)){toast('PNG, JPEG, WebP 이미지만 넣을 수 있어요');return}
   const r=new FileReader();
   r.onload=()=>{
@@ -588,7 +594,7 @@ function setImage(file,b){
     im.onload=()=>{
       let url=r.result;const m=Math.max(im.width,im.height);
       if(m>2400){const k=2400/m,c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);url=c.toDataURL('image/jpeg',.92)}
-      const id='a'+uid();assets[id]=url;b.assetId=id;renderCanvas();renderThumbs();renderPanel();changed();
+      const id='a'+uid();assets[id]=url;b[key]=id;renderCanvas();renderThumbs();renderPanel();changed();
     };
     im.src=r.result;
   };
@@ -663,6 +669,8 @@ document.addEventListener('click',e=>{
       case'valign':curPage().valign=v;renderCanvas();renderPanel();renderThumbs();changed();break;
       case'ratio':doc.frame.ratio=v;doc.frame.scale=FR[v].scale;renderAll();changed();break;
       case'pick-img':{const f=findBlock(st.sel);f&&pickImage(f.b);break}
+      case'pick-av':{const f=findBlock(st.sel);f&&pickImage(f.b,'avatarId');break}
+      case'clear-av':{const f=findBlock(st.sel);if(f){f.b.avatarId=null;renderCanvas();renderPanel();renderThumbs();changed()}break}
       case'clear-img':{const f=findBlock(st.sel);if(f){f.b.assetId=null;renderCanvas();renderPanel();renderThumbs();changed()}break}
       case'png-current':exportPages([st.page]);break;
       case'png-all':exportPages(doc.pages.map((_,k)=>k));break;
