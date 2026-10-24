@@ -159,12 +159,17 @@ input,select{font:inherit;color:inherit}
 .chips{display:flex;flex-wrap:wrap;gap:14px}
 .chip{padding:.2em .55em;border-radius:6px;line-height:1.5;letter-spacing:-.4px}
 .chip.emp{opacity:.4}
-.qans{display:flex;align-items:center;gap:26px;background:#f4f4f6;border-radius:30px;padding:26px 36px 26px 28px}
-.qans .av{width:100px;height:100px}.qans .av svg{width:74px;height:74px}
-.qam{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.qans{display:flex;align-items:center;gap:28px}
+.qans .av{width:104px;height:104px;background:#e9e8fb}.qans .av svg{width:78px;height:78px;color:#b9b6e8}
+.qam{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.qnr{display:flex;align-items:center;gap:16px}
 .qan{line-height:1.2;letter-spacing:-.3px}
-.qlv{font-size:.62em;font-weight:500;color:#5a6b8a;background:#fff;border:1px solid #e3e6ee;border-radius:999px;padding:4px 18px;line-height:1.3}
-.qans>svg{width:38px;height:38px;fill:none;stroke:#9a9aa2;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.qlv{font-size:.7em;font-weight:500;color:#5a6b8a;background:#eceefb;border-radius:999px;padding:5px 20px;line-height:1.3}
+.qtm{font-size:.8em;font-weight:400;color:#a6a6ae;line-height:1.3}
+.qans .dots{align-self:flex-start;margin-top:14px}.qans .dots i{background:#c4c4ca;width:6px;height:6px}
+.qr{display:flex;align-items:center;gap:52px;color:#9a9aa2}
+.qr .it{display:flex;align-items:center;gap:14px}
+.qr svg{width:1.45em;height:1.45em;fill:currentColor;flex:none}
 .qn{display:inline-flex;align-items:center;gap:.4em}
 .qn svg{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
 .qa{display:flex;align-items:center;gap:56px}
@@ -293,7 +298,7 @@ const FONTS=[
  {name:'IBM Plex Sans KR',css:'IBM+Plex+Sans+KR:wght@300;400;500;700'}
 ];
 const TEXT=['category','title','heading','paragraph','quote','caption','qtitle','qbody','dword','dlink','ddef','dex','dmore'];
-const LBL={category:'카테고리',title:'제목',profile:'프로필',heading:'소제목',paragraph:'본문',quote:'인용문',image:'이미지',caption:'캡션',divider:'구분선',qtitle:'질문 제목',qmeta:'상태줄',qbody:'질문 본문',qtags:'태그',qdate:'날짜·조회수',qacts:'하단 버튼',dword:'표제어',dlink:'연결어',dpos:'품사',qanswerer:'답변자',qnote:'안내 문구',ddef:'뜻풀이',dex:'예문',dmore:'더보기'};
+const LBL={category:'카테고리',title:'제목',profile:'프로필',heading:'소제목',paragraph:'본문',quote:'인용문',image:'이미지',caption:'캡션',divider:'구분선',qtitle:'질문 제목',qmeta:'상태줄',qbody:'질문 본문',qtags:'태그',qdate:'날짜·조회수',qacts:'하단 버튼',dword:'표제어',dlink:'연결어',dpos:'품사',qanswerer:'답변자',qreact:'답변 반응',qnote:'더보기·안내',ddef:'뜻풀이',dex:'예문',dmore:'더보기'};
 const PH={category:'카테고리',title:'제목을 입력하세요',heading:'소제목',paragraph:'본문을 입력하세요',quote:'인용문',caption:'이미지 설명',qtitle:'질문을 입력하세요',qbody:'질문 내용을 입력하세요',dword:'표제어',dlink:'연결어',ddef:'뜻풀이를 입력하세요',dex:'예문',dmore:'국어사전 결과 더보기'};
 /* 기본값은 3:4 카드(864x1152) 기준 논리 px. 본문형 레퍼런스: 글자 28 / 행간 약 2.1 / 문단 간격 40 / 자간 -0.02em / 왼쪽 여백 5% */
 const TD={
@@ -315,8 +320,9 @@ const TD={
  dword:{fs:44,fw:700,color:'#111111',ls:-1,lh:1.35,ps:0,mt:0,mb:6,align:'left'},
  dlink:{fs:26,fw:400,color:'#1a6fb5',ls:-0.4,lh:1.5,ps:0,mt:0,mb:22,align:'left'},
  dpos:{fs:22,fw:500,color:'#1a6fb5',mt:0,mb:18},
- qanswerer:{fs:34,fw:700,color:'#222222',mt:0,mb:34},
- qnote:{fs:22,fw:400,color:'#9a9aa2',mt:0,mb:30},
+ qanswerer:{fs:36,fw:700,color:'#222222',mt:0,mb:48},
+ qnote:{fs:30,fw:400,color:'#9a9aa2',mt:0,mb:44},
+ qreact:{fs:32,fw:400,color:'#9a9aa2',mt:0,mb:0},
  ddef:{fs:28,fw:400,color:'#111111',ls:-0.5,lh:1.6,ps:0,mt:0,mb:10,align:'left'},
  dex:{fs:25,fw:400,color:'#8a8a92',ls:-0.5,lh:1.6,ps:0,mt:0,mb:26,align:'left'},
  dmore:{fs:26,fw:400,color:'#1a6fb5',ls:-0.4,lh:1.5,ps:0,mt:6,mb:10,align:'left'}
@@ -342,6 +348,9 @@ const IC={
  search:'<svg viewBox="0 0 24 24"><circle cx="10.500" cy="10.500" r="6.500"/><path d="M15.500 15.500L21 21"/></svg>',
  mic:'<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
  cam:'<svg viewBox="0 0 24 24"><path d="M3.500 8h4l1.500-2.500h6L16.500 8h4v11h-17z"/><circle cx="12" cy="13" r="3.500"/></svg>',
+ up:'<svg viewBox="0 0 24 24"><path d="M2 10h4v11H2zM8 10l4-8c1.5 0 2.6 1.2 2.3 2.7L13.7 9H20a2 2 0 012 2.4l-1.4 7.4A2 2 0 0118.7 20H8z"/></svg>',
+ down:'<svg viewBox="0 0 24 24" style="transform:scaleY(-1)"><path d="M2 10h4v11H2zM8 10l4-8c1.5 0 2.6 1.2 2.3 2.7L13.7 9H20a2 2 0 012 2.4l-1.4 7.4A2 2 0 0118.7 20H8z"/></svg>',
+ bub:'<svg viewBox="0 0 24 24"><path d="M12 3C6.5 3 2.5 6.5 2.5 11c0 2.3 1.1 4.3 2.9 5.7L4.5 21l4.6-2.3c.9.2 1.9.3 2.9.3 5.5 0 9.5-3.5 9.5-8S17.500 3 12 3z"/></svg>',
  chev:'<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>',
  info:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
  zoomp:'<svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M14.500 14.500L20 20M7.500 10h5M10 7.500v5"/></svg>'
@@ -386,9 +395,10 @@ function defaultDoc(pf){
       nb('qacts')
     ]},
     {id:uid(),valign:'center',blocks:[
-      nb('qanswerer',{nickname:'닉네임****',level:'초수',avatarId:null}),
-      nb('qnote',{text:'본인 입력 포함 정보'}),
-      nb('qbody',{html:'<div>안녕하세요. 사랑이 무엇인지는 사람마다 다르게 답하는 것 같아요.</div><div>저는 상대의 세계가 궁금해지고, 그 사람 덕분에 내 세계가 조금 넓어지는 마음이라고 생각해요.</div>'})
+      nb('qanswerer',{nickname:'닉네임****',level:'exp',timeLabel:'2일 전',avatarId:null}),
+      nb('qbody',{html:'<div>사랑은 사람마다 다르게 답하는 것 같아요. 저는 상대의 세계가 궁금해지고, 그 덕분에 내 세계가 조금 넓어지는 마음이라고 생각해요.</div><div>그래서 좋은 사랑은 서로를 작게 만들지 않고, 같이 더 넓은 곳으로 데려가 주는 사이가 아닐까 해요.</div>'}),
+      nb('qnote',{text:'더보기'}),
+      nb('qreact',{likes:'2'})
     ]}
   ]});
   if(pf==='dict')return Object.assign(base,{pages:[
@@ -477,7 +487,7 @@ function blockEl(b,mode){
     const d=document.createElement('div');d.className='divl';d.style.height=s.th+'px';d.style.background=s.color;el.appendChild(d);
   }else if(b.type==='profile'){
     el.innerHTML='<div class="prof"><div class="av" data-av="'+b.id+'">'+(b.avatarId&&assets[b.avatarId]?'<img src="'+assets[b.avatarId]+'" alt="">':IC.person)+'</div><div class="pm"><div class="pn">'+esc(b.nickname)+'</div><div class="pt">'+esc(b.timeLabel)+'</div></div>'+(b.showStats?'<div class="pst">'+IC.chart+'통계</div>':'')+'<div class="dots"><i></i><i></i><i></i></div></div>';
-  }else if(['qmeta','qtags','qdate','qacts','dpos','qanswerer','qnote'].includes(b.type)){
+  }else if(['qmeta','qtags','qdate','qacts','dpos','qanswerer','qnote','qreact'].includes(b.type)){
     el.style.fontFamily=fstack(UIFONT);el.style.fontSize=s.fs+'px';el.style.fontWeight=s.fw;el.style.color=s.color;
     if(b.type==='qmeta'){
       const ac=s.ac||'#3f9d8c',p=[];
@@ -493,9 +503,11 @@ function blockEl(b,mode){
     }else if(b.type==='qacts'){
       el.innerHTML='<div class="qa"><span class="it">'+IC.qq+'나도 궁금해요</span><span class="it">'+IC.cmt+'댓글</span><span class="it">'+IC.shr+'</span><div class="dots"><i></i><i></i><i></i></div></div>';
     }else if(b.type==='qanswerer'){
-      el.innerHTML='<div class="qans"><div class="av" data-av="'+b.id+'">'+(b.avatarId&&assets[b.avatarId]?'<img src="'+assets[b.avatarId]+'" alt="">':IC.person)+'</div><div class="qam"><div class="qan">'+esc(b.nickname||'')+'</div>'+(b.level?'<span class="qlv">'+esc(b.level)+'</span>':'')+'</div>'+IC.chev+'</div>';
+      el.innerHTML='<div class="qans"><div class="av" data-av="'+b.id+'">'+(b.avatarId&&assets[b.avatarId]?'<img src="'+assets[b.avatarId]+'" alt="">':IC.person)+'</div><div class="qam"><div class="qnr"><span class="qan">'+esc(b.nickname||'')+'</span>'+(b.level?'<span class="qlv">'+esc(b.level)+'</span>':'')+'</div>'+(b.timeLabel?'<div class="qtm">'+esc(b.timeLabel)+'</div>':'')+'</div><div class="dots"><i></i><i></i><i></i></div></div>';
+    }else if(b.type==='qreact'){
+      el.innerHTML='<div class="qr"><span class="it">'+IC.up+esc(b.likes||'')+'</span><span class="it">'+IC.down+'</span><span class="it">'+IC.bub+'</span></div>';
     }else if(b.type==='qnote'){
-      el.innerHTML='<span class="qn">'+esc(b.text||'')+IC.info+'</span>';
+      el.innerHTML='<span class="qn">'+esc(b.text||'')+(/정보|안내/.test(b.text||'')?IC.info:'')+'</span>';
     }else if(b.type==='dpos'){
       el.innerHTML=(b.pron?'<div class="dpr" style="color:#777;font-size:'+Math.round(s.fs*1.25)+'px">'+esc(b.pron)+'</div>':'')+'<span class="dpill">'+esc(b.pos||'')+'</span>';
     }
@@ -564,7 +576,7 @@ function renderThumbs(){
 }
 const TB={
  blog:[[['category','카테고리'],['title','제목'],['heading','소제목'],['paragraph','본문'],['quote','인용문'],['caption','캡션']],[['image','이미지'],['profile','프로필'],['divider','구분선']]],
- qna:[[['qtitle','질문 제목'],['qmeta','상태줄'],['qbody','본문'],['qtags','태그'],['qdate','날짜·조회수'],['qacts','하단 버튼'],['qanswerer','답변자'],['qnote','안내 문구']],[['image','이미지'],['divider','구분선']]],
+ qna:[[['qtitle','질문 제목'],['qmeta','상태줄'],['qbody','본문'],['qtags','태그'],['qdate','날짜·조회수'],['qacts','하단 버튼'],['qanswerer','답변자'],['qreact','답변 반응'],['qnote','더보기·안내']],[['image','이미지'],['divider','구분선']]],
  dict:[[['dword','표제어'],['dlink','연결어'],['dpos','품사'],['ddef','뜻풀이'],['dex','예문'],['dmore','더보기'],['category','라벨']],[['image','이미지'],['divider','구분선']]]
 };
 function renderToolbar(){
@@ -644,9 +656,10 @@ function structPanel(b){
   if(t==='qtags')f=inp('태그','tags','사랑, 사랑이란')+'<div class="hint" style="padding:0 0 10px">쉼표(,)로 구분해요. #은 자동으로 붙어요.</div>';
   if(t==='qdate')f=inp('날짜','date','2026.10.21.')+inp('조회수','views','29');
   if(t==='dpos')f=inp('품사','pos','형용사')+inp('발음','pron','[다정하다]');
-  if(t==='qanswerer'){const hasAv=b.avatarId&&assets[b.avatarId];f=inp('닉네임','nickname','닉네임****')+inp('등급','level','초수')+'<button class="wide" data-do="pick-av">'+(hasAv?'프로필 사진 교체':'프로필 사진 선택')+'</button>'+(hasAv?'<div style="height:8px"></div><button class="wide" data-do="clear-av">프로필 사진 지우기</button>':'')+'<div style="height:12px"></div>'}
-  if(t==='qnote')f=inp('문구','text','본인 입력 포함 정보');
-  const sz=t==='qacts'?'':row('크기',pair('style','fs',10,80,1,s.fs))+row('색상',color('style','color',s.color));
+  if(t==='qanswerer'){const hasAv=b.avatarId&&assets[b.avatarId];f=inp('닉네임','nickname','닉네임****')+inp('등급','level','exp')+inp('시간','timeLabel','2일 전')+'<button class="wide" data-do="pick-av">'+(hasAv?'프로필 사진 교체':'프로필 사진 선택')+'</button>'+(hasAv?'<div style="height:8px"></div><button class="wide" data-do="clear-av">프로필 사진 지우기</button>':'')+'<div style="height:12px"></div>'}
+  if(t==='qnote')f=inp('문구','text','더보기');
+  if(t==='qreact')f=inp('좋아요 수','likes','2');
+  const sz=(t==='qacts'||t==='qreact')?'':row('크기',pair('style','fs',10,80,1,s.fs))+row('색상',color('style','color',s.color));
   return sec(LBL[t],blockActions()+'<div style="height:12px"></div>'+f+sz+(t==='qmeta'?row('강조색',color('style','ac',s.ac||'#3f9d8c')):'')+row('위 간격',pair('style','mt',0,200,1,s.mt))+row('아래 간격',pair('style','mb',0,200,1,s.mb)));
 }
 function dictHeaderPanel(){
@@ -797,8 +810,9 @@ function newBlock(t){
   if(t==='qtitle')return nb(t,{html:'',badge:''});
   if(t==='qmeta')return nb(t,{status:'비공개',adopt:''});
   if(t==='qtags')return nb(t,{tags:''});
-  if(t==='qanswerer')return nb(t,{nickname:'닉네임****',level:'초수',avatarId:null});
-  if(t==='qnote')return nb(t,{text:'본인 입력 포함 정보'});
+  if(t==='qanswerer')return nb(t,{nickname:'닉네임****',level:'exp',timeLabel:'2일 전',avatarId:null});
+  if(t==='qnote')return nb(t,{text:'더보기'});
+  if(t==='qreact')return nb(t,{likes:'2'});
   if(t==='qdate')return nb(t,{date:'',views:''});
   if(t==='dpos')return nb(t,{pos:'명사',pron:''});
   if(t==='ddef')return nb(t,{html:'',num:'1.'});
@@ -822,7 +836,7 @@ function moveBlock(d){
 function dupBlock(){const f=findBlock(st.sel);if(!f)return;const c=clone(f.b);c.id=uid();f.p.blocks.splice(f.i+1,0,c);st.sel=c.id;renderCanvas();renderPanel();renderThumbs();changed()}
 function delBlock(){const f=findBlock(st.sel);if(!f)return;f.p.blocks.splice(f.i,1);st.sel=null;renderCanvas();renderPanel();renderThumbs();changed()}
 function platformPage(t){
-  const pf=doc.platform,ts=pf==='qna'?(t==='answer'?['qanswerer','qnote','qbody']:['qtitle','qmeta','qbody','qtags','qdate','qacts']):['dword','dpos','ddef','dex'];
+  const pf=doc.platform,ts=pf==='qna'?(t==='answer'?['qanswerer','qbody','qnote','qreact']:['qtitle','qmeta','qbody','qtags','qdate','qacts']):['dword','dpos','ddef','dex'];
   return{id:uid(),valign:'center',blocks:ts.map(newBlock)};
 }
 function presetPage(t){
@@ -891,7 +905,7 @@ document.addEventListener('click',e=>{
   const fm=e.target.closest('[data-fmt]');if(fm)document.execCommand(fm.dataset.fmt);
 });
 function renderPmenu(){
-  const o=(doc.platform||'blog')==='qna'?[['question','질문 페이지','제목 · 상태줄 · 본문 · 태그'],['answer','답변 페이지','답변자 · 안내 문구 · 답변 본문']]:[['cover','표지형','카테고리 · 제목 · 프로필 · 이미지'],['text','본문형','세로 가운데 · 본문'],['mixed','혼합형','본문 · 이미지 · 캡션 · 본문']];
+  const o=(doc.platform||'blog')==='qna'?[['question','질문 페이지','제목 · 상태줄 · 본문 · 태그'],['answer','답변 페이지','답변자 · 답변 본문 · 더보기 · 반응']]:[['cover','표지형','카테고리 · 제목 · 프로필 · 이미지'],['text','본문형','세로 가운데 · 본문'],['mixed','혼합형','본문 · 이미지 · 캡션 · 본문']];
   $('#pmenu').innerHTML=o.map(x=>'<button data-do="add-page" data-v="'+x[0]+'">'+x[1]+'<small>'+x[2]+'</small></button>').join('');
 }
 $('#padd').addEventListener('click',()=>{if((doc.platform||'blog')==='dict'){addPage('x');return}renderPmenu();$('#pmenu').hidden=!$('#pmenu').hidden});
