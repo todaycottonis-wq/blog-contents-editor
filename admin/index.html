@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin · Layered Studio</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--ink:#111;--mute:#76767e;--line:#e8e8ea;--bg:#f6f6f7;--card:#fff;--acc:#111;--g:#5aa500;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,"Noto Sans KR",system-ui,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+a{color:inherit}
+.top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}.brand small{font-weight:600;color:var(--mute);background:#f0f0f2;border-radius:99px;padding:2px 9px;font-size:11px}
+.sp{flex:1}
+.seg{display:flex;background:#efeff1;border-radius:10px;padding:3px}.seg button{border:0;background:none;padding:6px 12px;border-radius:8px;font:inherit;font-size:13px;font-weight:600;color:#666;cursor:pointer}.seg button.on{background:#fff;color:#111;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 13px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}.btn:hover{border-color:#bbb}
+.upd{font-size:12px;color:var(--mute)}
+main{max-width:1180px;margin:0 auto;padding:24px 24px 80px}
+.gate{max-width:420px;margin:12vh auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:34px 30px;text-align:center}
+.gate h1{margin:0 0 8px;font-size:22px}.gate p{margin:0 0 22px;color:var(--mute);font-size:14px;line-height:1.7}
+.gg{display:flex;justify-content:center;min-height:44px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.card h3{margin:0 0 4px;font-size:13px;color:var(--mute);font-weight:600}
+.kv{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.2}.kv small{font-size:14px;font-weight:600;color:var(--mute);margin-left:4px}
+.ks{font-size:12px;color:var(--mute);margin-top:4px}
+h2{margin:30px 0 12px;font-size:17px;letter-spacing:-.02em}
+h2 small{font-weight:500;color:var(--mute);font-size:12.5px;margin-left:8px}
+.two{grid-template-columns:1.6fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.tabs button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font:inherit;font-size:12.5px;font-weight:600;color:#666;cursor:pointer}.tabs button.on{background:#111;border-color:#111;color:#fff}
+svg{display:block;width:100%;height:auto}
+.ax{font-size:10px;fill:#9a9aa2}
+.fun{display:flex;flex-direction:column;gap:10px}
+.fr{display:grid;grid-template-columns:110px 1fr 90px;gap:10px;align-items:center;font-size:13px}
+.fb{height:26px;border-radius:7px;background:#efeff1;overflow:hidden}.fb i{display:block;height:100%;background:linear-gradient(90deg,#c9e87a,#9ccc3c);border-radius:7px}
+.fr b{text-align:right;font-weight:700}.fr small{color:var(--mute);font-weight:500;margin-left:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;text-align:left;border-bottom:1px solid #f0f0f2}th{color:var(--mute);font-weight:600;font-size:12px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.ret td{border:0;padding:4px}.ret .c{text-align:center;border-radius:6px;font-weight:600;font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:#efeff1;overflow:hidden;min-width:60px}.bar i{display:block;height:100%;background:#111;border-radius:99px}
+.note{font-size:12px;color:var(--mute);line-height:1.7;margin-top:30px}
+.err{background:#fff3f2;color:#b42318;border:1px solid #fecdca;border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:14px}
+.empty{color:var(--mute);font-size:13px;padding:14px 0;text-align:center}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}.fr{grid-template-columns:90px 1fr 80px}.kv{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in">
+  <div class="brand">Layered Studio <small>Admin</small></div><div class="sp"></div>
+  <div class="seg" id="range" hidden></div>
+  <span class="upd" id="upd"></span>
+  <button class="btn" id="reload" hidden>새로고침</button>
+  <button class="btn" id="out" hidden>로그아웃</button>
+</div></div>
+<main id="app"></main>
+<script>
+(()=>{
+'use strict';
+const SB_URL='https://nhcnbfouudvgdaxnedwy.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oY25iZm91dWR2Z2RheG5lZHd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4MDgxNDIsImV4cCI6MjEwODM4NDE0Mn0.IP0vgk1cNX0mH_Ldo_sKbWvsNXBjzAG-s_EBE55M7bY',GOOGLE_CLIENT_ID='360366295717-62cp3k4ah74vdi814i9096s0cfuraq4b.apps.googleusercontent.com';
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=n=>(+n||0).toLocaleString('ko-KR');
+const EVT={view:'화면 조회',app_open:'앱 열기',template_start:'템플릿으로 시작',start_click:'시작 버튼 클릭',draft_save:'임시저장',draft_open:'임시저장 열기',page_added:'페이지 추가',block_added:'블록 추가',platform_selected:'형식 선택',login_click:'로그인 클릭',login_success:'로그인 성공',export_click:'내보내기 클릭',export_success:'내보내기 완료',export_warn:'내보내기 경고',frame_selected:'프레임 선택',bulk_build:'글로 한번에 만들기',image_uploaded:'이미지 업로드',video_added:'동영상 추가',json_save:'프로젝트 파일 저장',cloud_open:'클라우드 열기'};
+const SCR={home:'랜딩',ws:'워크스페이스',tpl:'템플릿',editor:'에디터',acct:'내 계정',legal:'약관·방침'};
+const DEV={desktop:'PC',mobile:'모바일'};
+let days=30,tab='visitors',data=null,timer=null;
+
+/* ---------- 로그인 ---------- */
+const sha=async t=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+async function mountGoogle(el){
+  for(let i=0;i<8&&!(window.google&&google.accounts&&google.accounts.id);i++)await new Promise(r=>setTimeout(r,400));
+  try{
+    const raw=btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))),hashed=await sha(raw);
+    google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,nonce:hashed,callback:async r=>{
+      if(!r||!r.credential)return;
+      const x=await sb.auth.signInWithIdToken({provider:'google',token:r.credential,nonce:raw});
+      if(x.error){alert('로그인하지 못했어요: '+x.error.message);return}
+      boot();
+    }});
+    google.accounts.id.renderButton(el,{type:'standard',theme:'outline',size:'large',text:'continue_with',locale:'ko',width:300});
+  }catch(e){
+    el.innerHTML='<button class="btn" id="oa">Google로 로그인</button>';
+    $('#oa').onclick=()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/admin'}});
+  }
+}
+function gate(msg,showLogin){
+  $('#range').hidden=$('#reload').hidden=true;
+  $('#app').innerHTML='<div class="gate"><h1>관리자 로그인</h1><p>'+msg+'</p>'+(showLogin?'<div class="gg" id="gg"></div>':'<button class="btn" id="out2">다른 계정으로 로그인</button>')+'</div>';
+  if(showLogin)mountGoogle($('#gg'));
+  else $('#out2').onclick=async()=>{await sb.auth.signOut();boot()};
+}
+
+/* ---------- 데이터 ---------- */
+async function boot(){
+  clearInterval(timer);
+  const {data:s}=await sb.auth.getSession();
+  if(!s.session){$('#out').hidden=true;gate('관리자 계정(구글)으로 로그인해 주세요.',true);return}
+  $('#out').hidden=false;
+  const a=await sb.rpc('is_admin');
+  if(a.error||a.data!==true){gate('<b>'+esc(s.session.user.email)+'</b> 계정은 관리자 권한이 없어요.<br>관리자로 등록된 계정으로 로그인해 주세요.',false);return}
+  $('#range').hidden=$('#reload').hidden=false;
+  await load();
+  timer=setInterval(()=>{if(document.visibilityState==='visible')load()},60000);
+}
+async function load(){
+  const r=await sb.rpc('admin_stats',{p_days:days});
+  if(r.error){$('#app').innerHTML='<div class="err">통계를 불러오지 못했어요: '+esc(r.error.message)+'</div>';return}
+  data=r.data;render(data);
+}
+
+/* ---------- 그리기 ---------- */
+function dur(s){s=Math.round(+s||0);return s>=60?Math.floor(s/60)+'분 '+(s%60)+'초':s+'초'}
+function pct(a,b){return b>0?Math.round(a/b*1000)/10:0}
+function barChart(rows,key,color){
+  const W=760,H=210,L=34,B=24,T=10,R=6,n=rows.length,max=Math.max(1,...rows.map(r=>+r[key]||0));
+  const bw=(W-L-R)/n,ticks=[0,.5,1];
+  let g='';
+  ticks.forEach(t=>{const y=T+(H-T-B)*(1-t);g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="#eee"/><text class="ax" x="'+(L-6)+'" y="'+(y+3)+'" text-anchor="end">'+Math.round(max*t)+'</text>'});
+  const step=Math.ceil(n/10);
+  rows.forEach((r,i)=>{
+    const v=+r[key]||0,h=(H-T-B)*v/max,x=L+i*bw+bw*.18,y=H-B-h;
+    g+='<rect x="'+x+'" y="'+y+'" width="'+(bw*.64)+'" height="'+Math.max(h,v?1.5:0)+'" rx="3" fill="'+color+'"><title>'+esc(String(r.d).slice(5))+' · '+v+'</title></rect>';
+    if(i%step===0||i===n-1)g+='<text class="ax" x="'+(x+bw*.32)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(String(r.d).slice(5).replace('-','/'))+'</text>';
+  });
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg>';
+}
+function table(rows,cols){
+  if(!rows.length)return '<div class="empty">데이터가 아직 없어요</div>';
+  return '<table><thead><tr>'+cols.map(c=>'<th class="'+(c.n?'n':'')+'">'+c.h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+cols.map(c=>'<td class="'+(c.n?'n':'')+'">'+c.f(r)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+}
+function render(d){
+  const k=d.kpi,daily=d.daily||[];
+  const rng=[7,14,30,90].map(x=>'<button data-d="'+x+'" class="'+(x===days?'on':'')+'">'+x+'일</button>').join('');
+  $('#range').innerHTML=rng;
+  $('#upd').textContent='업데이트 '+new Date(d.generated_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  const bounce=pct(k.single_view_sessions,k.sessions);
+  const cards=[
+    ['방문자',num(k.visitors),'명','브라우저 기준(익명)'],
+    ['세션',num(k.sessions),'회','평균 '+(k.visitors?(k.sessions/k.visitors).toFixed(1):'0')+'회/방문자'],
+    ['페이지뷰',num(k.views),'회','세션당 '+(k.sessions?(k.views/k.sessions).toFixed(1):'0')+'회'],
+    ['평균 체류시간',dur(k.avg_session_sec),'','2개 이상 기록된 세션 기준'],
+    ['신규 가입',num(k.signups),'명','누적 가입 '+num(k.total_users)+'명'],
+    ['로그인 사용자',num(k.login_users),'명','기간 내 로그인 상태로 활동'],
+    ['내보내기',num(k.exports),'회','PNG·MP4 저장 완료'],
+    ['지금 접속',num(k.live_5m),'명','최근 5분 · 한 화면만 본 세션 '+bounce+'%']
+  ];
+  const f=d.funnel||[],fmax=Math.max(1,...f.map(x=>+x.visitors));
+  const mets=[['visitors','방문자','#9ccc3c'],['sessions','세션','#7aa6f0'],['views','페이지뷰','#f0b35a'],['signups','가입','#e57aa8'],['exports','내보내기','#555']];
+  const cur=mets.find(m=>m[0]===tab)||mets[0];
+  const smax=Math.max(1,...(d.screens||[]).map(x=>+x.views));
+  const emax=Math.max(1,...(d.top_events||[]).map(x=>+x.count));
+  $('#app').innerHTML=
+   '<div class="grid kpis">'+cards.map(c=>'<div class="card"><h3>'+c[0]+'</h3><div class="kv">'+c[1]+'<small>'+c[2]+'</small></div><div class="ks">'+c[3]+'</div></div>').join('')+'</div>'+
+   '<h2>일별 추이<small>한국 시간 기준</small></h2><div class="card"><div class="tabs" id="mt">'+mets.map(m=>'<button data-m="'+m[0]+'" class="'+(m[0]===tab?'on':'')+'">'+m[1]+'</button>').join('')+'</div>'+barChart(daily,cur[0],cur[2])+'</div>'+
+   '<div class="grid two"><div><h2>전환 흐름<small>방문자 수 기준</small></h2><div class="card"><div class="fun">'+f.map((x,i)=>'<div class="fr"><span>'+esc(x.step)+'</span><div class="fb"><i style="width:'+Math.max(2,x.visitors/fmax*100)+'%"></i></div><b>'+num(x.visitors)+'<small>'+(i?pct(x.visitors,f[i-1].visitors)+'%':'')+'</small></b></div>').join('')+'</div><div class="ks" style="margin-top:12px">오른쪽 %는 바로 앞 단계 대비입니다. 로그인 성공은 가입 직후뿐 아니라 재방문 로그인도 포함돼요.</div></div></div>'+
+   '<div><h2>재방문율<small>처음 온 날 기준(최근 4주)</small></h2><div class="card"><table class="ret"><thead><tr><th>첫 방문일</th><th class="n">인원</th><th class="n">D+1</th><th class="n">D+7</th></tr></thead><tbody>'+
+    ((d.retention||[]).slice().reverse().map(r=>{const c=v=>v==null?'<td class="c" style="color:#bbb">–</td>':'<td class="c" style="background:rgba(120,190,40,'+Math.min(.85,pct(v,r.size)/60)+')">'+pct(v,r.size)+'%</td>';return '<tr><td>'+esc(String(r.date).slice(5).replace('-','/'))+'</td><td class="n">'+num(r.size)+'</td>'+c(r.d1)+c(r.d7)+'</tr>'}).join('')||'<tr><td colspan="4" class="empty">데이터가 아직 없어요</td></tr>')+
+   '</tbody></table><div class="ks" style="margin-top:10px">D+1은 다음 날, D+7은 7일 뒤에 다시 온 비율이에요. 인원이 적을 땐 참고만 하세요.</div></div></div></div>'+
+   '<div class="grid two"><div><h2>화면별 조회</h2><div class="card">'+table(d.screens||[],[{h:'화면',f:r=>esc(SCR[r.screen]||r.screen)},{h:'',f:r=>'<div class="bar"><i style="width:'+r.views/smax*100+'%"></i></div>'},{h:'조회',n:1,f:r=>num(r.views)},{h:'방문자',n:1,f:r=>num(r.visitors)}])+'</div></div>'+
+   '<div><h2>기기</h2><div class="card">'+table(d.devices||[],[{h:'기기',f:r=>esc(DEV[r.device]||r.device)},{h:'방문자',n:1,f:r=>num(r.visitors)},{h:'비율',n:1,f:r=>pct(r.visitors,(d.devices||[]).reduce((a,b)=>a+(+b.visitors),0))+'%'}])+'</div></div></div>'+
+   '<h2>사용 기록<small>이벤트별</small></h2><div class="card">'+table(d.top_events||[],[{h:'이벤트',f:r=>esc(EVT[r.name]||r.name)+' <span style="color:#bbb;font-size:11px">'+esc(r.name)+'</span>'},{h:'',f:r=>'<div class="bar"><i style="width:'+r.count/emax*100+'%"></i></div>'},{h:'횟수',n:1,f:r=>num(r.count)},{h:'사용자',n:1,f:r=>num(r.visitors)}])+'</div>'+
+   '<div class="grid two"><div><h2>시작한 템플릿</h2><div class="card">'+table(d.templates||[],[{h:'형식 / 종류',f:r=>esc(r.template)},{h:'횟수',n:1,f:r=>num(r.count)},{h:'사용자',n:1,f:r=>num(r.visitors)}])+'</div></div>'+
+   '<div><h2>유입 경로</h2><div class="card">'+table(d.referrers||[],[{h:'출처',f:r=>esc(r.ref)+(r.utm?' <span style="color:#999">('+esc(r.utm)+')</span>':'')},{h:'방문자',n:1,f:r=>num(r.visitors)}])+'</div></div></div>'+
+   '<p class="note">방문자는 브라우저마다 만들어지는 익명 ID 기준이라, 같은 사람이 다른 기기·브라우저로 오면 따로 셉니다. 시크릿 창이나 사이트 데이터를 지운 경우도 새 방문자로 집계돼요. 체류시간은 30초마다 보내는 활동 신호로 계산해서, 이 기능을 켜기 전 기록은 짧게 나올 수 있어요.</p>';
+  $('#mt').onclick=e=>{const b=e.target.closest('[data-m]');if(b){tab=b.dataset.m;render(data)}};
+}
+$('#range').onclick=e=>{const b=e.target.closest('[data-d]');if(b){days=+b.dataset.d;load()}};
+$('#reload').onclick=()=>load();
+$('#out').onclick=async()=>{await sb.auth.signOut();boot()};
+window.__render=render;
+boot();
+})();
+</script>
+</body>
+</html>

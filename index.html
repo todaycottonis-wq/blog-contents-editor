@@ -183,6 +183,7 @@ input,select{font:inherit;color:inherit}
 .pfb img{width:100%;height:100%;object-fit:cover;display:block}
 .pfm{position:absolute;right:0;top:46px;min-width:230px;background:#fff;border:1px solid #e8e8ea;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.14);padding:8px;z-index:60;text-align:left}
 .pfm .pfh{padding:10px 12px;border-bottom:1px solid #eee;margin-bottom:6px}.pfm .pfh b{display:block;font-size:14px;color:#111}.pfm .pfh small{color:#76767e;font-size:12px;word-break:break-all}
+.pfm .pft{margin:0 4px 6px;padding:7px 10px;border-radius:8px;background:#f1fbd9;color:#3b6300;font-size:12px;font-weight:600}
 .pfm a,.pfm button{display:block;width:100%;text-align:left;padding:9px 12px;border:0;background:none;border-radius:8px;font-size:13.5px;color:#111;cursor:pointer;font-family:inherit;text-decoration:none}
 .pfm a:hover,.pfm button:hover{background:#f4f4f6}
 /* ===== 내 계정 · 템플릿 오픈 예정 ===== */
@@ -775,7 +776,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-
 <section class="lp-faq">
   <h2>자주 묻는 질문</h2>
   <div class="lp-fq">
-    <details open><summary>무료인가요?</summary><p>11월 7일까지 로그인(처음 로그인하면 자동으로 가입돼요)해 주시는 분들께 <b>7일 무료 체험권</b>을 드리고 있어요. 로그인하면 자동으로 적용돼요.</p></details>
+    <details open><summary>무료인가요?</summary><p>11월 7일까지 로그인(처음 로그인하면 자동으로 가입돼요)해 주시는 분들께 <b>7일 무료 체험권</b>을 드리고 있어요. 로그인하면 자동으로 적용되고, 체험 기간은 가입한 날부터 7일이에요.</p></details>
     <details><summary>영상은 얼마나 넣을 수 있나요?</summary><p>mp4·webm·mov 영상을 100MB 이하, 60초 이하로 넣을 수 있어요.</p></details>
     <details><summary>일반 텍스트형은 언제 열려요?</summary><p>11월 안에 오픈할 예정이에요. 인스타 1.5만 · 캐러셀 누적 조회수 300만회 넘는 코튼의 노하우를 담아 준비하고 있어요.</p></details>
   </div>
@@ -1795,8 +1796,9 @@ function track(name,props){
 function detachCloud(){cloudId=null;lsSet('bse_cloud_id','')}
 const cloudAssets=new Set();
 function profileHTML(){
+  const t=trialInfo();
   const md=user.user_metadata||{},nm=md.full_name||md.name||(user.email||'').split('@')[0]||'내 계정',av=md.avatar_url||md.picture;
-  return '<div class="pfw"><button class="pfb" data-pfm aria-label="내 계정 메뉴" title="'+esc(nm)+'">'+(av?'<img src="'+esc(av)+'" alt="" referrerpolicy="no-referrer">':esc(nm.slice(0,1).toUpperCase()))+'</button><div class="pfm" hidden><div class="pfh"><b>'+esc(nm)+'</b><small>'+esc(user.email||'')+'</small></div><a href="/account">내 계정</a><a href="/workspace">워크스페이스</a><button data-pfout>로그아웃</button></div></div>';
+  return '<div class="pfw"><button class="pfb" data-pfm aria-label="내 계정 메뉴" title="'+esc(nm)+'">'+(av?'<img src="'+esc(av)+'" alt="" referrerpolicy="no-referrer">':esc(nm.slice(0,1).toUpperCase()))+'</button><div class="pfm" hidden><div class="pfh"><b>'+esc(nm)+'</b><small>'+esc(user.email||'')+'</small></div>'+(t&&t.active?'<div class="pft">무료 체험 '+(t.ms<864e5?t.hours+'시간':t.left+'일')+' 남음</div>':'')+'<a href="/account">내 계정</a><a href="/workspace">워크스페이스</a><button data-pfout>로그아웃</button></div></div>';
 }
 function paintAuth(){try{if(curView==='v-acct')renderAcct()}catch(e){}
   const nr=document.querySelector('.lp-nr');if(nr)nr.innerHTML=user?profileHTML():'<a class="lp-tl" href="/" data-login>로그인</a>';
@@ -1864,25 +1866,22 @@ function loginGate(pend){
   modal('지금은 무료예요!','<p class="lgsub">무료로 로그인하고<br><b>7일 무료 체험권</b>을 받아가세요.<br>'+(pend?'로그인하면 고른 템플릿으로 바로 시작해요.':'로그인하면 워크스페이스에서 바로 시작해요.')+'</p><div class="lgg" id="lg-gb"></div><p class="lgnote">처음 로그인하면 자동으로 가입돼요.<br>로그인하면 <a href="/terms">이용약관</a>과 <a href="/privacy">개인정보처리방침</a>에 동의하게 돼요.</p>',[{label:'닫기'}]);
   mountGoogle($('#lg-gb'),pend);
 }
-/* 7일 무료 체험권: 로그인 때 한 번 시작해요 (이 브라우저에 기록. 계정별 서버 저장은 아직이에요) */
+/* 7일 무료 체험: 가입한 날(계정이 처음 만들어진 시각, Supabase 서버 기록)부터 7일 */
 const TRIAL_DAYS=7;
 function trialInfo(){
   if(!user)return null;
-  const k='bse_trial_'+user.id;let t=parseInt(lsGet(k),10),fresh=false;
-  if(!t){t=Date.now();lsSet(k,String(t));fresh=true}
-  const end=t+TRIAL_DAYS*864e5,left=Math.max(0,Math.ceil((end-Date.now())/864e5));
-  return {start:t,end,left,fresh,active:Date.now()<end};
+  const start=Date.parse(user.created_at)||Date.now(),end=start+TRIAL_DAYS*864e5,ms=end-Date.now();
+  return {start,end,ms,left:Math.max(0,Math.ceil(ms/864e5)),hours:Math.max(0,Math.ceil(ms/36e5)),active:ms>0,fresh:Date.now()-start<10*60*1000&&!lsGet('bse_trial_seen_'+user.id)};
 }
-function grantTrial(){const t=trialInfo();if(t&&t.fresh)setTimeout(()=>toast('7일 무료 체험권이 적용됐어요'),400)}
+function grantTrial(){const t=trialInfo();if(t&&t.fresh){lsSet('bse_trial_seen_'+user.id,'1');setTimeout(()=>toast('가입을 환영해요! 7일 무료 체험권이 적용됐어요'),400)}}
 const fmtD=t=>new Date(t).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
 function renderAcct(){
   const box=$('#acct');if(!box)return;
   if(!user){box.innerHTML='<div class="acg"><div class="acc"><div class="acp nolg"><div><div class="acn">로그인이 필요해요</div><div class="acm">로그인하면 계정과 7일 무료 체험권을 볼 수 있어요.</div></div><div class="lgg" id="ac-gb" style="max-width:260px"></div></div></div></div>';mountGoogle($('#ac-gb'),'');return}
   const md=user.user_metadata||{},nm=md.full_name||md.name||(user.email||'').split('@')[0]||'내 계정',av=md.avatar_url||md.picture,t=trialInfo();
-  const pct=t.active?Math.round(t.left/TRIAL_DAYS*100):0;
-  box.innerHTML='<div class="acg">'
+    box.innerHTML='<div class="acg">'
    +'<div class="acc"><div class="acp">'+(av?'<img src="'+esc(av)+'" alt="" referrerpolicy="no-referrer">':'<div class="acav"></div>')+'<div><div class="acn">'+esc(nm)+'</div><div class="acm">'+esc(user.email||'')+(user.created_at?' · '+fmtD(Date.parse(user.created_at))+' 가입':'')+'</div></div></div></div>'
-   +'<div class="acc"><h4>7일 무료 체험</h4>'+(t.active?'<div class="acbig">'+t.left+'<small>일 남았어요</small></div><div class="acbar"><i style="width:'+pct+'%"></i></div><div class="acm">'+fmtD(t.start)+' 시작 · '+fmtD(t.end)+'까지</div>':'<div class="acbig" style="font-size:20px">체험 기간이 끝났어요</div><div class="acnote">지금은 모든 기능을 무료로 쓸 수 있어요. 유료 요금제는 준비 중이에요.</div>')+'<div class="acnote">체험 기록은 이 브라우저에 저장돼요.</div></div>'
+   +'<div class="acc"><h4>7일 무료 체험</h4>'+(t.active?'<div class="acbig">'+(t.ms<864e5?t.hours:t.left)+'<small>'+(t.ms<864e5?'시간':'일')+' 남았어요</small></div><div class="acbar"><i style="width:'+Math.max(2,Math.round(t.ms/(TRIAL_DAYS*864e5)*100))+'%"></i></div><div class="acm">'+fmtD(t.start)+' 가입 · '+fmtD(t.end)+'까지</div>':'<div class="acbig" style="font-size:20px">체험 기간이 끝났어요</div><div class="acnote">지금은 모든 기능을 무료로 쓸 수 있어요. 유료 요금제는 준비 중이에요.</div>')+'<div class="acnote">가입한 날부터 7일 동안 무료 체험이에요.</div></div>'
    +'<div class="acc"><h4>계정</h4><div class="acrow"><span>요금제</span><span>'+(t.active?'무료 체험 중':'무료')+'</span></div><div class="acrow"><span>유료 요금제</span><span>준비 중</span></div><div class="acrow"><span>로그아웃</span><button class="btn sm" id="ac-out">로그아웃</button></div></div>'
    +'</div>';
   $('#ac-out').onclick=async()=>{await sb.auth.signOut();toast('로그아웃했어요');nav('/')}
@@ -2154,9 +2153,9 @@ const LEGAL={
 <h2>1. 수집하는 정보와 방법</h2>
 <table>
 <tr><th>구분</th><th>항목</th><th>수집 방법</th></tr>
-<tr><td>Google 로그인 시</td><td>이메일 주소, 이름, 프로필 사진, 계정 식별자</td><td>이용자가 Google 계정으로 로그인할 때 Google이 제공</td></tr>
-<tr><td>이용 중 자동 생성</td><td>무작위로 만든 익명 ID, 세션 ID, 이용한 화면·기능 기록(예: 템플릿 선택, 내보내기), 기기 유형(PC·모바일)</td><td>서비스 이용 중 자동 수집 (브라우저의 ‘추적 안 함(Do Not Track)’을 켜면 수집하지 않아요)</td></tr>
-<tr><td>이용자 기기에만 저장</td><td>임시저장한 글·이미지·영상, 7일 무료 체험 시작일, 로그인 유지 정보</td><td>브라우저 저장소(IndexedDB, localStorage). 운영자 서버로 전송되지 않아요</td></tr>
+<tr><td>Google 로그인 시</td><td>이메일 주소, 이름, 프로필 사진, 계정 식별자, 가입 일시(7일 무료 체험 기간 계산에 사용)</td><td>이용자가 Google 계정으로 로그인할 때 Google이 제공</td></tr>
+<tr><td>이용 중 자동 생성</td><td>무작위로 만든 익명 ID, 세션 ID, 이용한 화면·기능 기록(예: 템플릿 선택, 내보내기), 이용 중 30초마다 보내는 활동 신호(체류시간 계산용), 기기 유형(PC·모바일)</td><td>서비스 이용 중 자동 수집 (브라우저의 ‘추적 안 함(Do Not Track)’을 켜면 수집하지 않아요)</td></tr>
+<tr><td>이용자 기기에만 저장</td><td>임시저장한 글·이미지·영상, 로그인 유지 정보</td><td>브라우저 저장소(IndexedDB, localStorage). 운영자 서버로 전송되지 않아요</td></tr>
 </table>
 <p>서비스는 이용자가 만든 글·이미지·영상 콘텐츠를 서버에 저장하지 않습니다.</p>
 <h2>2. 이용 목적</h2>
@@ -2185,7 +2184,7 @@ const LEGAL={
 <h2>6. 이용자의 권리</h2>
 <p>이용자는 언제든지 자신의 개인정보에 대해 열람, 정정, 삭제, 처리 정지를 요청할 수 있고, 계정 삭제(탈퇴)를 요청할 수 있습니다. <a href="mailto:${LEGAL_EMAIL}">${LEGAL_EMAIL}</a> 로 요청해 주시면 지체 없이 조치합니다.</p>
 <h2>7. 브라우저 저장소 사용</h2>
-<p>서비스는 로그인 유지와 임시저장을 위해 브라우저 저장소를 사용합니다. 브라우저 설정에서 사이트 데이터를 삭제하면 언제든지 지울 수 있으며, 삭제하면 임시저장본과 체험 시작 기록이 사라질 수 있습니다.</p>
+<p>서비스는 로그인 유지와 임시저장을 위해 브라우저 저장소를 사용합니다. 브라우저 설정에서 사이트 데이터를 삭제하면 언제든지 지울 수 있으며, 삭제하면 임시저장본이 사라질 수 있습니다.</p>
 <h2>8. 안전성 확보 조치</h2>
 <ul>
 <li>모든 통신은 암호화(HTTPS)하여 전송합니다.</li>
@@ -2321,6 +2320,8 @@ function initPick(){
   }catch(e){}
 }
 initPick();
+/* 체류시간 집계용 활동 신호: 화면을 보고 있는 동안 30초마다 한 번(세션당 최대 60번) */
+(()=>{let n=0;setInterval(()=>{if(document.visibilityState==='visible'&&document.hasFocus()&&n<60){n++;track('ping',{v:curView?curView.slice(2):'',n})}},30000)})();
 /* ---------- 시작 ---------- */
 (async function boot(){
   document.execCommand('defaultParagraphSeparator',false,'div');

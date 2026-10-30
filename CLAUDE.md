@@ -86,3 +86,10 @@
 - 버튼을 못 불러오면 `oauthLogin`(예전 리디렉션 방식)으로 자동 전환 → 이 경우 Google 클라이언트의 승인된 리디렉션 URI(`https://nhcnbfouudvgdaxnedwy.supabase.co/auth/v1/callback`)가 필요.
 - 필요한 설정: Google Cloud 승인된 JavaScript 원본에 `https://layeredstudio.app`, Supabase Authentication → Google 제공자 켜기(Client ID에 위 값, Client Secret) 및 `Skip nonce checks`는 끈 상태 유지.
 - 로컬(`localhost`)은 승인된 원본이 아니라 실제 로그인은 배포 주소에서만 확인 가능.
+
+## 2026-10-30 (6차) 체험 카운팅 · 관리자 페이지
+- **7일 무료 체험**: 이제 로컬 저장이 아니라 **가입 시점(Supabase `auth.users.created_at`)부터 7일**. `trialInfo()`가 계산, 내 계정 화면(`#acct`)에 남은 일수(24시간 미만이면 시간)·진행 막대·종료일 표시, 프로필 메뉴에도 "무료 체험 N일 남음". 지금은 표시용이고 기능을 막지는 않음. 첫 가입 직후 토스트는 `bse_trial_seen_<userId>`로 한 번만.
+- **체류시간 신호**: 화면을 보고 있는 동안 30초마다 `ping` 이벤트(세션당 최대 60회). 관리자 통계의 체류시간 계산용. 개인정보처리방침에 반영함.
+- **관리자 페이지** `/admin`(`admin/index.html`, 정적, noindex): 구글 로그인(공식 버튼) → `rpc('is_admin')` 확인 → `rpc('admin_stats',{p_days})`. KPI(방문자·세션·페이지뷰·체류시간·가입·내보내기·지금 접속), 일별 추이, 전환 흐름, 재방문율(D+1/D+7), 화면별 조회, 기기, 이벤트별 횟수, 템플릿, 유입 경로. 사용자가 보낸 문자열은 모두 `esc()`로 이스케이프.
+- **DB(Supabase 프로젝트 nhcnbfouudvgdaxnedwy, 마이그레이션 `admin_analytics`)**: `public.admin_emails`(RLS 켜고 정책 없음 = API로 못 읽음), `public.is_admin()`(로그인 이메일이 목록에 있으면 true), `public._admin_stats_core(int)`(직접 호출 불가), `public.admin_stats(int)`(관리자만 실행, 아니면 `forbidden`). **관리자 추가**: SQL Editor에서 `insert into public.admin_emails values ('이메일@gmail.com');` (소문자). 제거는 `delete from public.admin_emails where email='…';`.
+- 통계는 한국 시간(Asia/Seoul) 기준, 방문자는 브라우저 익명 ID(`anon_id`) 기준.
