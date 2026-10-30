@@ -777,7 +777,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-
   <h2>자주 묻는 질문</h2>
   <div class="lp-fq">
     <details open><summary>무료인가요?</summary><p>11월 7일까지 로그인(처음 로그인하면 자동으로 가입돼요)해 주시는 분들께 <b>7일 무료 체험권</b>을 드리고 있어요. 로그인하면 자동으로 적용되고, 체험 기간은 가입한 날부터 7일이에요.</p></details>
-    <details><summary>영상은 얼마나 넣을 수 있나요?</summary><p>mp4·webm·mov 영상을 100MB 이하, 60초 이하로 넣을 수 있어요.</p></details>
+    <details><summary>영상은 얼마나 넣을 수 있나요?</summary><p>mp4·webm·mov 영상을 100MB 이하, 40초 이하로 넣을 수 있어요.</p></details>
     <details><summary>일반 텍스트형은 언제 열려요?</summary><p>11월 안에 오픈할 예정이에요. 인스타 1.5만 · 캐러셀 누적 조회수 300만회 넘는 코튼의 노하우를 담아 준비하고 있어요.</p></details>
   </div>
   <p class="lp-fh">더 궁금한 점은 인스타그램 <a href="https://www.instagram.com/cotton.224/" target="_blank" rel="noopener noreferrer">@cotton.224</a>로 편하게 물어봐 주세요.</p>
@@ -1020,7 +1020,7 @@ function hdrEl(mode){
 }
 /* ---------- 동영상(이미지 블록에 넣는 mp4/webm) ---------- */
 let videos={};const vurls={};
-const VID_MAX_MB=100,VID_MAX_SEC=60;
+const VID_MAX_MB=100,VID_MAX_SEC=40;
 const vidURL=id=>vurls[id]||(vurls[id]=URL.createObjectURL(videos[id]));
 const usedVideos=()=>{const o={};doc.pages.forEach(p=>p.blocks.forEach(b=>{if(b.videoId&&videos[b.videoId])o[b.videoId]=videos[b.videoId]}));return o};
 const pageHasVideo=p=>p.blocks.some(b=>b.type==='image'&&b.videoId&&videos[b.videoId]);
@@ -1774,7 +1774,7 @@ async function renderVideoBlob(p,fontCSS,prog){
   let bgBlob;try{await htmlToImage.toBlob(n,opt);bgBlob=await htmlToImage.toBlob(n,opt)}finally{h.removeChild(n)}
   const bg=await createImageBitmap(bgBlob);
   const vids=await Promise.all(slots.map(sl=>new Promise((ok,no)=>{
-    const v=document.createElement('video');v.src=vidURL(sl.id);v.playsInline=true;v.preload='auto';v.style.cssText='position:fixed;left:-9999px;width:2px;height:2px';document.body.appendChild(v);
+    const v=document.createElement('video');v.src=vidURL(sl.id);v.playsInline=true;v.preload='auto';v.style.cssText='position:fixed;left:0;bottom:0;width:48px;height:48px;opacity:.02;pointer-events:none;z-index:-1';document.body.appendChild(v);
     v.muted=!!sl.mute;v.onloadeddata=()=>ok(v);v.onerror=()=>no(new Error('동영상을 읽지 못했어요'));
   })));
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d');
@@ -1784,13 +1784,21 @@ async function renderVideoBlob(p,fontCSS,prog){
   const rec=new MediaRecorder(stream,Object.assign({videoBitsPerSecond:6e6},mime?{mimeType:mime}:{})),chunks=[];
   rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
   const stopped=new Promise(res=>rec.onstop=res);
-  const dur=Math.max(...vids.map(v=>v.duration));
+  const dur=Math.min(Math.max(...vids.map(v=>v.duration)),VID_MAX_SEC+1);
   const draw=()=>{cx.drawImage(bg,0,0);slots.forEach((sl,i)=>drawSlot(cx,vids[i],sl))};
   draw();rec.start(500);
   try{
     if(ac&&ac.state==='suspended')await ac.resume();
     await Promise.all(vids.map(v=>{v.currentTime=0;return v.play()}));
-    await new Promise(res=>{const tick=()=>{draw();const t=Math.max(...vids.map(v=>v.currentTime));prog&&prog(Math.min(t,dur),dur);if(vids.every(v=>v.ended)||t>=dur-0.04)res();else requestAnimationFrame(tick)};tick()});
+    await new Promise(res=>{
+      const w0=performance.now();let lastT=-1,lastMove=w0;
+      const tick=()=>{
+        draw();const now=performance.now(),t=Math.max(...vids.map(v=>v.currentTime));prog&&prog(Math.min(t,dur),dur);
+        if(t>lastT+0.01){lastT=t;lastMove=now}
+        else if(now-lastMove>1500){vids.forEach(v=>{if(!v.ended&&v.paused)v.play().catch(()=>{})});lastMove=now}
+        if(vids.every(v=>v.ended)||t>=dur-0.04||now-w0>(dur+8)*1000)res();else requestAnimationFrame(tick)
+      };tick()
+    });
     await new Promise(r=>setTimeout(r,250));
   }finally{
     if(rec.state!=='inactive')rec.stop();await stopped;
