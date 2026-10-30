@@ -19,6 +19,7 @@
 <meta name="twitter:description" content="나만의 생각을, 가장 나다운 콘텐츠로">
 <meta name="twitter:image" content="https://layeredstudio.app/og-image.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" crossorigin="anonymous" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Nanum+Gothic:wght@400;700&family=Nanum+Myeongjo:wght@400;700&family=Gothic+A1:wght@300;400;500;700&family=IBM+Plex+Sans+KR:wght@300;400;500;700&display=swap">
@@ -197,6 +198,7 @@ input,select{font:inherit;color:inherit}
 .acp.nolg{flex-direction:column;align-items:flex-start;gap:12px}
 .tplsoon .th{display:flex;align-items:center;justify-content:center;min-height:212px;border:1.5px dashed #cfcfd4;border-radius:16px;background:#fafafa;color:#9a9aa2;font-size:12px;font-weight:700;letter-spacing:.1em}
 .chip2 .soonb{margin-left:6px;font-size:10.5px;font-weight:600;color:#8a8a92;background:#f1f1f3;border-radius:99px;padding:2px 7px}
+.lgg{display:flex;justify-content:center;align-items:center;min-height:44px;width:100%}.lgg iframe{max-width:100%}
 .lgnote a{color:#111;text-decoration:underline}
 .lgnote{margin:14px 0 0;color:#8a8a92;font-size:12.5px;line-height:1.6;text-align:center}
 /* ===== 질답형 / 사전형 ===== */
@@ -1821,18 +1823,46 @@ async function initAuth(){
   }catch(e){authReady=true;route()}
 }
 const GSVG='<svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 01-2.2 3.3v2.7h3.6c2.1-1.9 3.2-4.8 3.2-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.3 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0012 23z"/><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 010-4.4V7H2.1a11 11 0 000 10z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 002.1 7l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
-/* 로그인 = 구글 로그인 창으로 바로 이동 (가입 단계 없음, 처음 로그인하면 자동 가입) */
-async function googleLogin(pend){
+/* 로그인: 구글 공식 로그인 버튼(Google Identity Services). 구글 창에 우리 앱 이름이 나오고, 받은 신분 확인 값을 Supabase에 넘겨 로그인해요.
+   버튼을 못 불러오면(차단·오프라인 등) 예전 방식(리디렉션)으로 바꿔서 보여줘요. */
+const GOOGLE_CLIENT_ID='360366295717-62cp3k4ah74vdi814i9096s0cfuraq4b.apps.googleusercontent.com';
+const sha256hex=async t=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+async function renderGsi(el,pend){
+  if(!sb||!(window.google&&google.accounts&&google.accounts.id))return false;
+  try{
+    const raw=btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))),hashed=await sha256hex(raw);
+    google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,nonce:hashed,callback:async resp=>{
+      if(!resp||!resp.credential){toast('Google 로그인을 완료하지 못했어요');return}
+      track('login_click');if(pend)lsSet('bse_pending',pend);
+      const r=await sb.auth.signInWithIdToken({provider:'google',token:resp.credential,nonce:raw});
+      if(r.error){console.warn(r.error);toast('로그인하지 못했어요. 잠시 후 다시 시도해 주세요')}
+    }});
+    google.accounts.id.renderButton(el,{type:'standard',theme:'outline',size:'large',text:'continue_with',shape:'rectangular',logo_alignment:'left',width:Math.max(200,Math.min(320,innerWidth-110)),locale:'ko'});
+    return true;
+  }catch(e){return false}
+}
+async function oauthLogin(pend){
   if(!sb){toast('로그인 기능을 불러오지 못했어요. 인터넷 연결을 확인하세요');return}
   track('login_click');
   if(pend)lsSet('bse_pending',pend);lsSet('bse_login','1');
   const r=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/'}});
   if(r.error)toast('Google 로그인을 시작하지 못했어요')
 }
-/* 템플릿을 쓰려면 로그인이 필요해요: 무료 + 7일 체험권 안내 */
+async function mountGoogle(el,pend){
+  for(let i=0;i<8&&!(window.google&&google.accounts&&google.accounts.id);i++)await new Promise(r=>setTimeout(r,400));
+  const ok=await renderGsi(el,pend);
+  await new Promise(r=>setTimeout(r,900));
+  if(!el.isConnected)return;
+  if(!ok||!el.childElementCount||!el.offsetHeight){
+    el.innerHTML='<button class="lgb gg" type="button">'+GSVG+'Google로 계속하기</button>';
+    el.firstChild.onclick=()=>oauthLogin(pend);
+  }
+}
+function googleLogin(pend){loginGate(pend||'')}
+/* 앱을 쓰려면 로그인이 필요해요: 무료 + 7일 체험권 안내 */
 function loginGate(pend){
-  modal('지금은 무료예요!','<p class="lgsub">무료로 로그인하고<br><b>7일 무료 체험권</b>을 받아가세요.<br>'+(pend?'로그인하면 고른 템플릿으로 바로 시작해요.':'로그인하면 워크스페이스에서 바로 시작해요.')+'</p><button class="lgb gg" id="lg-g">'+GSVG+'Google로 계속하기</button><p class="lgnote">처음 로그인하면 자동으로 가입돼요.<br>로그인하면 <a href="/terms">이용약관</a>과 <a href="/privacy">개인정보처리방침</a>에 동의하게 돼요.</p>',[{label:'닫기'}]);
-  $('#lg-g').onclick=()=>googleLogin(pend);
+  modal('지금은 무료예요!','<p class="lgsub">무료로 로그인하고<br><b>7일 무료 체험권</b>을 받아가세요.<br>'+(pend?'로그인하면 고른 템플릿으로 바로 시작해요.':'로그인하면 워크스페이스에서 바로 시작해요.')+'</p><div class="lgg" id="lg-gb"></div><p class="lgnote">처음 로그인하면 자동으로 가입돼요.<br>로그인하면 <a href="/terms">이용약관</a>과 <a href="/privacy">개인정보처리방침</a>에 동의하게 돼요.</p>',[{label:'닫기'}]);
+  mountGoogle($('#lg-gb'),pend);
 }
 /* 7일 무료 체험권: 로그인 때 한 번 시작해요 (이 브라우저에 기록. 계정별 서버 저장은 아직이에요) */
 const TRIAL_DAYS=7;
@@ -1847,7 +1877,7 @@ function grantTrial(){const t=trialInfo();if(t&&t.fresh)setTimeout(()=>toast('7�
 const fmtD=t=>new Date(t).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
 function renderAcct(){
   const box=$('#acct');if(!box)return;
-  if(!user){box.innerHTML='<div class="acg"><div class="acc"><div class="acp nolg"><div><div class="acn">로그인이 필요해요</div><div class="acm">로그인하면 계정과 7일 무료 체험권을 볼 수 있어요.</div></div><button class="lgb gg" id="ac-g" style="max-width:260px">'+GSVG+'Google로 계속하기</button></div></div></div>';$('#ac-g').onclick=()=>googleLogin();return}
+  if(!user){box.innerHTML='<div class="acg"><div class="acc"><div class="acp nolg"><div><div class="acn">로그인이 필요해요</div><div class="acm">로그인하면 계정과 7일 무료 체험권을 볼 수 있어요.</div></div><div class="lgg" id="ac-gb" style="max-width:260px"></div></div></div></div>';mountGoogle($('#ac-gb'),'');return}
   const md=user.user_metadata||{},nm=md.full_name||md.name||(user.email||'').split('@')[0]||'내 계정',av=md.avatar_url||md.picture,t=trialInfo();
   const pct=t.active?Math.round(t.left/TRIAL_DAYS*100):0;
   box.innerHTML='<div class="acg">'

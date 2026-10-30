@@ -80,3 +80,9 @@
 - **`vercel.json` 필수**: 위 4개 경로를 `/index.html`로 rewrite 해야 새로고침·직접 접속이 됨(없으면 404). `/terms`, `/privacy`는 정적 폴더라 rewrite 불필요.
 - 구글 로그인 복귀 주소(`redirectTo`)는 항상 사이트 루트(`/`).
 - 로컬 테스트: `python3 spa.py <폴더> <포트>` 같은 SPA 폴백 서버가 필요(일반 `http.server`는 `/workspace` 새로고침이 404).
+
+## 2026-10-30 (5차) 구글 로그인 방식
+- 로그인은 **Google Identity Services 공식 버튼 + `sb.auth.signInWithIdToken`**(`renderGsi`, `mountGoogle`). 구글 창에 "~.supabase.co(으)로 이동" 대신 앱 이름이 나오게 하려는 목적. 클라이언트 ID는 코드의 `GOOGLE_CLIENT_ID`(공개값). nonce는 매번 새로 만들어 해시를 구글에, 원본을 Supabase에 넘김.
+- 버튼을 못 불러오면 `oauthLogin`(예전 리디렉션 방식)으로 자동 전환 → 이 경우 Google 클라이언트의 승인된 리디렉션 URI(`https://nhcnbfouudvgdaxnedwy.supabase.co/auth/v1/callback`)가 필요.
+- 필요한 설정: Google Cloud 승인된 JavaScript 원본에 `https://layeredstudio.app`, Supabase Authentication → Google 제공자 켜기(Client ID에 위 값, Client Secret) 및 `Skip nonce checks`는 끈 상태 유지.
+- 로컬(`localhost`)은 승인된 원본이 아니라 실제 로그인은 배포 주소에서만 확인 가능.
