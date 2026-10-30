@@ -1368,13 +1368,23 @@ document.addEventListener('selectionchange',()=>{
   const s=getSelection();if(s.rangeCount&&s.anchorNode){const n=s.anchorNode.nodeType===3?s.anchorNode.parentNode:s.anchorNode;if(n.closest&&n.closest('.tx'))savedRange=s.getRangeAt(0).cloneRange()}
 });
 document.addEventListener('mousedown',e=>{if(e.target.closest('[data-fmt]'))e.preventDefault()});
+const PASTE_SPLIT_MIN=140;   /* 이 글자 수를 넘는 글을 본문에 붙여넣으면 나눠 담을지 물어봐요 */
+const plainInsert=txt=>{txt.split(/\r?\n/).forEach((l,i)=>{if(i)document.execCommand('insertParagraph');if(l)document.execCommand('insertText',false,l)})};
+function offerSplit(txt,blockId,txEl){
+  const sel=getSelection(),rng=sel.rangeCount?sel.getRangeAt(0).cloneRange():null;
+  modal('긴 글을 붙여넣었어요','<p style="color:var(--mute);font-size:13px;line-height:1.75;margin:0">글이 길어서 한 페이지에 모두 담기 어려워요.<br>한 페이지에 본문이 <b>최대 6줄</b>을 넘지 않게 여러 페이지로 나눠 담을까요?</p>',[
+    {label:'그대로 붙여넣기',fn:()=>{txEl.focus();if(rng){const s2=getSelection();s2.removeAllRanges();s2.addRange(rng)}plainInsert(txt)}},
+    {label:'나눠서 담기',cls:'dark',fn:()=>bulkBuild(txt,{cover:false,head:true,br:'auto',valign:'center',maxLines:6,replacePage:true})}]);
+}
 document.addEventListener('paste',e=>{
   if(e.target.matches&&e.target.matches('input,textarea,select'))return;
   const items=[...((e.clipboardData&&e.clipboardData.items)||[])],im=items.find(i=>i.type.indexOf('image/')===0);
   if(im){e.preventDefault();const f=findBlock(st.sel);const b=f&&f.b.type==='image'?f.b:insertBlock('image');setImage(im.getAsFile(),b);return}
   if(e.target.closest&&e.target.closest('.tx')){
-    e.preventDefault();const lines=(e.clipboardData.getData('text/plain')||'').split(/\r?\n/);
-    lines.forEach((l,i)=>{if(i)document.execCommand('insertParagraph');if(l)document.execCommand('insertText',false,l)});
+    e.preventDefault();const txt=e.clipboardData.getData('text/plain')||'';
+    const blk=e.target.closest('.blk'),fb=blk&&findBlock(blk.dataset.id);
+    if(fb&&fb.b.type==='paragraph'&&(doc.platform||'blog')==='blog'&&(txt.length>PASTE_SPLIT_MIN||txt.split(/\r?\n/).filter(Boolean).length>6)){offerSplit(txt,fb.b.id,e.target.closest('.tx'));return}
+    plainInsert(txt);
   }
 });
 document.addEventListener('keydown',e=>{
@@ -1554,41 +1564,82 @@ $('#ttl').addEventListener('input',e=>{doc.title=e.target.value;changed()});
 /* ---------- 글 붙여넣기 → 카드 자동 분할 ---------- */
 function bulkOpen(){
   modal('글로 한번에 만들기',
-   '<p style="color:var(--mute);font-size:13px;margin-bottom:10px">글을 붙여넣으면 카드 크기에 맞춰 페이지를 나눠요. 붙여넣은 글은 모두 본문으로 들어가요. 줄바꿈은 문단이 되고, <b>1.</b> 처럼 숫자로 시작하는 줄이나 <b>#</b> 줄은 굵은 소제목이 돼요. 기본 글자 크기·자간·간격 그대로, 위아래 여백이 남도록 나눠서 현재 페이지 뒤에 추가돼요.</p>'+
+   '<p style="color:var(--mute);font-size:13px;margin-bottom:10px">글을 붙여넣으면 카드 크기에 맞춰 페이지를 나눠요. 붙여넣은 글은 모두 본문으로 들어가요. <b>빈 줄</b>은 문단 사이 간격이 되고, 문단 안에서 엔터로 줄을 바꾼 곳은 그대로 줄바꿈으로 남아요. <b>1.</b> 처럼 숫자로 시작하는 줄이나 <b>#</b> 줄은 굵은 소제목이 돼요. <b>---</b> 만 적은 줄은 그 자리에서 새 페이지를 시작해요. 기본 글자 크기·자간·간격 그대로, 한 페이지에 본문이 <b>최대 6줄</b>을 넘지 않게 나눠서 현재 페이지 뒤에 추가돼요(줄 수는 아래에서 바꿀 수 있어요).</p>'+
    '<textarea id="bt" placeholder="여기에 글을 붙여넣으세요" style="width:100%;height:210px;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;line-height:1.6;resize:vertical"></textarea>'+
    '<div style="margin-top:12px;line-height:2.1;font-size:13px">'+
    '<label><input type="checkbox" id="bo-cover"> 첫 줄을 제목으로 표지 페이지 만들기</label><br>'+
    '<label><input type="checkbox" id="bo-head" checked> 소제목(숫자·#) 줄에서 새 페이지 시작</label><br>'+
+   '<label>한 페이지 본문 최대 줄 수 <select id="bo-ml"><option value="4">4줄</option><option value="5">5줄</option><option value="6" selected>6줄 (기본)</option><option value="7">7줄</option><option value="8">8줄</option><option value="10">10줄</option><option value="0">제한 없음(칸 가득)</option></select></label><br>'+
+   '<label>줄바꿈 방식 <select id="bo-br"><option value="auto">자동 (빈 줄이 있으면 빈 줄로 문단 구분)</option><option value="para">엔터마다 새 문단</option><option value="soft">빈 줄로 문단 구분, 엔터는 줄바꿈</option></select></label><br>'+
    '<label>본문 세로 위치 <select id="bo-va"><option value="center">가운데</option><option value="top">위</option></select></label></div>',
-   [{label:'취소'},{label:'만들기',cls:'dark',fn:()=>bulkBuild($('#bt').value,{cover:$('#bo-cover').checked,head:$('#bo-head').checked,valign:$('#bo-va').value})}]);
+   [{label:'취소'},{label:'만들기',cls:'dark',fn:()=>bulkBuild($('#bt').value,{cover:$('#bo-cover').checked,head:$('#bo-head').checked,br:$('#bo-br').value,maxLines:+$('#bo-ml').value,valign:$('#bo-va').value})}]);
 }
 const BULK_PAD=84; /* 위아래로 남겨 둘 여백(논리 px 합계) — 가운데 정렬했을 때 위·아래 끝에 붙지 않게 */
 async function bulkBuild(text,opt){
-  const lines=String(text||'').replace(/\r/g,'').split('\n').map(l=>l.trim()).filter(Boolean);
-  if(!lines.length){toast('글을 먼저 붙여넣어 주세요');return}
+  const raw=String(text||'').replace(/\r/g,'');
+  if(!raw.trim()){toast('글을 먼저 붙여넣어 주세요');return}
   if(text.length>30000){toast('글이 너무 길어요 (3만 자 이하)');return}
   toast('페이지를 나누는 중…');
   const ff=(doc.ts.paragraph&&doc.ts.paragraph.ff)||'Noto Sans KR';
   try{await Promise.all([300,400,500,700].map(w=>document.fonts.load(w+' 28px "'+ff+'"',text)));await document.fonts.ready}catch(e){}
-  let titleLine=null;if(opt.cover)titleLine=lines.shift();
-  const isH=l=>/^(\d+[.)]\s|#{1,3}\s)/.test(l);
+  /* 줄 단위로 읽되 빈 줄은 그대로 남겨 둬요 (빈 줄 = 문단 구분) */
+  const src=raw.split('\n').map(l=>l.trim());
+  let titleLine=null;
+  if(opt.cover){const i=src.findIndex(Boolean);titleLine=src[i];src.splice(i,1)}
+  const isH=l=>/^(\d+[.)]\s|#{1,3}\s)/.test(l),isSep=l=>/^(-{3,}|={3,}|\*{3,})$/.test(l);
   const toHtml=(l,h)=>h?'<b>'+esc(l.replace(/^#{1,3}\s/,''))+'</b>':esc(l);
+  const hasBlank=src.some((l,i)=>!l&&src.slice(0,i).some(Boolean)&&src.slice(i+1).some(Boolean));
+  const soft=opt.br==='soft'||(opt.br!=='para'&&hasBlank);   /* 빈 줄이 있으면 빈 줄로 문단을 나누고, 엔터는 같은 문단 안의 줄바꿈 */
+  const units=[];let grp=[];
+  const flushGrp=()=>{if(grp.length){units.push({k:'p',lines:grp});grp=[]}};
+  for(const l of src){
+    if(!l){flushGrp();continue}
+    if(isSep(l)){flushGrp();units.push({k:'sep'});continue}
+    if(isH(l)){flushGrp();units.push({k:'h',lines:[l]});continue}
+    if(soft)grp.push(l);else units.push({k:'p',lines:[l]});
+  }
+  flushGrp();
   const holderEl=holder();
   const mk=items=>({id:'t',valign:opt.valign,blocks:[nb('paragraph',{html:items.map(x=>'<div>'+x.h+'</div>').join('')})]});
-  const fits=items=>{const n=renderPage(mk(items),'export');holderEl.appendChild(n);const o=pageOverflow(n,BULK_PAD);holderEl.removeChild(n);return !o};
+  const MAXL=opt.maxLines===undefined?6:opt.maxLines;   /* 한 페이지 본문 최대 줄 수(0이면 제한 없음) */
+  const fits=items=>{
+    const n=renderPage(mk(items),'export');holderEl.appendChild(n);
+    let o=pageOverflow(n,BULK_PAD);
+    if(!o&&MAXL){
+      const tx=n.querySelector('.b-paragraph .tx');
+      if(tx){const lh=parseFloat(getComputedStyle(tx).lineHeight)||1;let ln=0;[...tx.children].forEach(d=>{ln+=Math.max(1,Math.round(d.offsetHeight/lh))});o=ln>MAXL}
+    }
+    holderEl.removeChild(n);return !o;
+  };
   const pieces=[];
-  for(const l of lines){
-    const h=isH(l),full=toHtml(l,h);
-    if(fits([{h:full}])){pieces.push({h:full,head:h});continue}
-    const raw=l.replace(/^#{1,3}\s/,'');
-    let toks=raw.split(/(?<=[.!?])\s+/);
-    if(toks.some(t=>!fits([{h:esc(t)}])))toks=raw.split(/\s+/);
+  /* 한 줄이 한 페이지에 안 들어갈 때만 문장 → 단어 순으로 쪼개요 */
+  const splitLine=(l,head)=>{
+    const full=toHtml(l,head);
+    if(fits([{h:full}])){pieces.push({h:full,head});return}
+    const rawl=l.replace(/^#{1,3}\s/,'');
+    let toks=rawl.split(/(?<=[.!?])\s+/);
+    if(toks.some(t=>!fits([{h:esc(t)}])))toks=rawl.split(/\s+/);
     let acc='';
     for(const t of toks){
       const next=acc?acc+' '+t:t;
       if(acc&&!fits([{h:esc(next)}])){pieces.push({h:esc(acc),head:false});acc=t}else acc=next;
     }
     if(acc)pieces.push({h:esc(acc),head:false});
+  };
+  for(const u of units){
+    if(u.k==='sep'){pieces.push({sep:true});continue}
+    if(u.k==='h'){splitLine(u.lines[0],true);continue}
+    const whole=u.lines.map(esc).join('<br>');
+    if(fits([{h:whole}])){pieces.push({h:whole,head:false});continue}
+    /* 문단이 너무 길면 줄바꿈 위치에서 먼저 나눠요 */
+    let acc=[];
+    const out=()=>{if(acc.length){pieces.push({h:acc.map(esc).join('<br>'),head:false});acc=[]}};
+    for(const l of u.lines){
+      if(!fits([{h:esc(l)}])){out();splitLine(l,false);continue}
+      const cand=acc.concat([l]);
+      if(acc.length&&!fits([{h:cand.map(esc).join('<br>')}])){out();acc=[l]}else acc=cand;
+    }
+    out();
   }
   const pages=[];let cur=[];
   const flush=()=>{
@@ -1598,6 +1649,7 @@ async function bulkBuild(text,opt){
     pages.push(cur);cur=carry?[carry]:[];
   };
   for(const p of pieces){
+    if(p.sep){if(cur.length){pages.push(cur);cur=[]}continue}
     if(p.head&&opt.head&&cur.length){pages.push(cur);cur=[]}
     if(cur.length&&!fits(cur.concat([p])))flush();
     cur.push(p);
@@ -1606,8 +1658,10 @@ async function bulkBuild(text,opt){
   const out=[];
   if(titleLine!==null)out.push({id:uid(),valign:'center',blocks:[nb('title',{html:esc(titleLine.replace(/^#{1,3}\s/,'')),style:{mt:28,mb:34}}),nb('profile',{nickname:'닉네임',timeLabel:'방금 전',showStats:true}),nb('image',{assetId:null,style:{mt:24,ar:'4:3'}})]});
   pages.forEach(items=>{const p=mk(items);p.id=uid();out.push(p)});
-  doc.pages.splice(st.page+1,0,...out);
-  setPage(st.page+1);changed();track('bulk_build',{pages:out.length,chars:text.length<500?'lt500':text.length<2000?'lt2000':'gte2000'});
+  const idx0=st.page,origEmpty=opt.replacePage&&isEmptyDoc({pages:[doc.pages[idx0]]});
+  doc.pages.splice(idx0+1,0,...out);
+  if(origEmpty&&doc.pages.length>1){doc.pages.splice(idx0,1);setPage(idx0)}else setPage(idx0+1);
+  changed();track('bulk_build',{pages:out.length,chars:text.length<500?'lt500':text.length<2000?'lt2000':'gte2000'});
   toast(out.length+'장을 추가했어요');
 }
 
