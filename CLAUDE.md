@@ -93,3 +93,6 @@
 - **관리자 페이지** `/admin`(`admin/index.html`, 정적, noindex): 구글 로그인(공식 버튼) → `rpc('is_admin')` 확인 → `rpc('admin_stats',{p_days})`. KPI(방문자·세션·페이지뷰·체류시간·가입·내보내기·지금 접속), 일별 추이, 전환 흐름, 재방문율(D+1/D+7), 화면별 조회, 기기, 이벤트별 횟수, 템플릿, 유입 경로. 사용자가 보낸 문자열은 모두 `esc()`로 이스케이프.
 - **DB(Supabase 프로젝트 nhcnbfouudvgdaxnedwy, 마이그레이션 `admin_analytics`)**: `public.admin_emails`(RLS 켜고 정책 없음 = API로 못 읽음), `public.is_admin()`(로그인 이메일이 목록에 있으면 true), `public._admin_stats_core(int)`(직접 호출 불가), `public.admin_stats(int)`(관리자만 실행, 아니면 `forbidden`). **관리자 추가**: SQL Editor에서 `insert into public.admin_emails values ('이메일@gmail.com');` (소문자). 제거는 `delete from public.admin_emails where email='…';`.
 - 통계는 한국 시간(Asia/Seoul) 기준, 방문자는 브라우저 익명 ID(`anon_id`) 기준.
+
+## 2026-10-30 (7차) 글로 한번에 만들기 기본값
+- 붙여넣은 글은 **모두 본문**으로 들어감(`첫 줄을 제목으로 표지 페이지 만들기` 기본 해제). 본문 블록은 기본 글자 크기·자간(-0.6)·행간(2.1)·문단 간격 그대로, 세로 위치는 가운데. 페이지를 나눌 때 위아래 여백이 남도록 `BULK_PAD`(84px)만큼 덜 채움(`pageOverflow(pg,pad)`).
