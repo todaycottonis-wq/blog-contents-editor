@@ -62,3 +62,21 @@
 - **일반 텍스트형**: 워크스페이스·새로 만들기·템플릿 필터에 "오픈 예정" 표시만(기능 없음).
 - **Supabase**: 코드는 아직 `nhcnbfouudvgdaxnedwy` 사용. 새 프로젝트 `dgnbyvxxlqgriuxaxnmw`는 MCP 계정에서 찾지 못함. 구글 로그인 쓰려면 Supabase Auth → Google 제공자 + URL Configuration(Vercel 주소) 필요.
 - **테스트 팁**: 로컬 서버(`python3 -m http.server`)로 열 것(`file://`은 내장 브라우저에서 안 열림). 가짜 로그인은 localStorage `sb-<ref>-auth-token`에 만료 안 된 세션 JSON을 넣으면 됨. IntersectionObserver 기반 동작(예시 카드 자동 넘김)은 백그라운드 탭에서 동작하지 않음.
+
+## 2026-10-30 (2차) 추가
+- **로그인 필수**: `#/workspace`, `#/templates`, `#/editor`는 로그아웃 상태면 랜딩으로 돌려보내고 로그인 창(`loginGate`)을 띄움(`route()`의 `GUARDED`). 원래 가려던 주소는 `bse_after`에 저장, 로그인 후 `afterLogin()`이 이동. `+ 새로 만들기`·형식 버튼도 로그아웃 상태면 로그인 창. `authReady`가 true가 되기 전에는 보호 화면을 그리지 않음. OAuth 복귀 감지는 `bse_login` 플래그.
+- **빈 작업은 저장 안 함**: `isEmptyDoc()`이 true면 `draftSave`가 저장하지 않고, 워크스페이스를 열 때 기존 빈 임시저장도 자동 삭제.
+- **랜딩 첫 화면**: 해시가 없으면 항상 랜딩(`#/`). 예전처럼 마지막 작업을 자동으로 열지 않음.
+- **제주 예시 카드 자동 넘김**: 페이지 스크롤(세로 휠)로는 멈추지 않고, 카드를 직접 만지면 6초 쉬었다가 다시 진행.
+- **약관 정적 페이지**: `terms/index.html`, `privacy/index.html`(주소 `/terms`, `/privacy`). 구글 동의 화면 등 외부 입력용. 앱 안 `#/terms`, `#/privacy`와 내용이 같아야 하므로 `LEGAL` 문구를 고치면 두 정적 파일도 같이 고칠 것.
+- **도메인 후보(2026-10-30 Vercel 조회)**: layeredstudio.app $14.99/년(갱신 $15), layeredclub.com $11.25, layeredstudio.net $13.5, layeredstudio.io $14.99(갱신 $46), layered.club $29.47(프리미엄), layeredstudio.com/.co/.kr/layered.studio는 이미 등록됨.
+
+## 2026-10-30 (3차)
+- **도메인**: `https://layeredstudio.app` (Vercel에서 구매, 첫해 $9.99, 갱신 $15/년). 랜딩 주소는 `#/` 없이 깨끗하게 보이도록 `route()`가 해시를 제거. 다른 화면은 아직 `#/workspace` 같은 해시 주소.
+- **공유 미리보기(OG)**: `index.html` head의 `og:*`, `twitter:*` 메타 + 루트 `og-image.png`(1200×630, 랜딩 히어로 배경 + "Layered studio"). 제목 "Layered studio", 설명 "나만의 생각을, 가장 나다운 콘텐츠로". 이미지를 바꾸면 카카오·페이스북 등은 캐시가 남아 새로 긁어가기 필요.
+
+## 2026-10-30 (4차) 주소 체계
+- 화면 주소를 해시(`#/workspace`)에서 경로(`/workspace`, `/templates`, `/editor`, `/account`)로 변경. `nav(path)`가 `history.pushState`로 이동하고 `route()`가 `location.pathname`을 읽음. 예전 `#/…` 링크는 `route()`가 자동으로 경로로 바꿈. 앱 내부 링크는 `NAVP` 목록에 있는 `a[href^="/"]`만 가로채서 새로고침 없이 이동.
+- **`vercel.json` 필수**: 위 4개 경로를 `/index.html`로 rewrite 해야 새로고침·직접 접속이 됨(없으면 404). `/terms`, `/privacy`는 정적 폴더라 rewrite 불필요.
+- 구글 로그인 복귀 주소(`redirectTo`)는 항상 사이트 루트(`/`).
+- 로컬 테스트: `python3 spa.py <폴더> <포트>` 같은 SPA 폴백 서버가 필요(일반 `http.server`는 `/workspace` 새로고침이 404).

@@ -1,1 +1,8 @@
-{"cleanUrls":true}
+{
+  "rewrites": [
+    { "source": "/workspace", "destination": "/index.html" },
+    { "source": "/templates", "destination": "/index.html" },
+    { "source": "/editor", "destination": "/index.html" },
+    { "source": "/account", "destination": "/index.html" }
+  ]
+}

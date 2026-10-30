@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Layered Studio</title>
 <meta name="description" content="블로그·Q&A·사전 화면처럼 읽는 맛이 나는 카드뉴스를 글만 붙여넣어 만들어요. 인스타 규격(1080×1350) 그대로 내려받고, 가입 없이 무료.">
+<link rel="canonical" href="https://layeredstudio.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Layered studio">
+<meta property="og:title" content="Layered studio">
+<meta property="og:description" content="나만의 생각을, 가장 나다운 콘텐츠로">
+<meta property="og:url" content="https://layeredstudio.app/">
+<meta property="og:image" content="https://layeredstudio.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Layered studio">
+<meta name="twitter:description" content="나만의 생각을, 가장 나다운 콘텐츠로">
+<meta name="twitter:image" content="https://layeredstudio.app/og-image.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -655,7 +668,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-
 <div class="app view" id="v-editor" hidden>
   <header class="top">
     <div class="tl">
-      <a class="homebtn" href="#/" title="홈으로"><svg class="lmg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a><span class="vsep"></span>
+      <a class="homebtn" href="/" title="홈으로"><svg class="lmg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a><span class="vsep"></span>
       <input id="ttl" class="ttl" spellcheck="false" aria-label="작업 이름">
       <select id="plat" class="plat" aria-label="형식"><option value="" disabled>형식 선택</option><option value="blog">블로그형</option><option value="qna">질답형</option><option value="dict">사전형</option></select>
       <span id="saved" class="saved">저장됨 ✓</span>
@@ -666,7 +679,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-
       <button id="redo" class="ic" data-do="redo" title="다시 실행"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 000 11H13"/></svg></button>
       <button id="draft" class="pill" data-do="draft-save" title="지금 작업을 이 브라우저에 임시저장 (Ctrl/⌘+S)">임시저장</button>
       <button id="auth" hidden></button>
-      <a class="pill" href="#/workspace" style="display:inline-flex;align-items:center;text-decoration:none">워크스페이스</a>
+      <a class="pill" href="/workspace" style="display:inline-flex;align-items:center;text-decoration:none">워크스페이스</a>
       <div class="dd">
         <button class="pill dark" data-menu>다운로드 ▾</button>
         <div class="menu" hidden>
@@ -703,12 +716,12 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-
 
 
 <div class="pv" id="v-home" hidden>
-<nav class="lp-nav"><a class="lp-brand" href="#/"><svg class="lp-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a>
-  <div class="lp-nr"><a class="lp-tl" href="#/" data-login>로그인</a></div></nav>
+<nav class="lp-nav"><a class="lp-brand" href="/"><svg class="lp-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a>
+  <div class="lp-nr"><a class="lp-tl" href="/" data-login>로그인</a></div></nav>
 <header class="lp-hero"><div class="lp-hi">
   <p class="lp-eye">나만의 생각을, 가장 나다운 콘텐츠로</p>
   <h1>Layered studio</h1>
-  <div class="lp-cta"><button class="lp-b" data-gate>바로 시작하기</button><a class="lp-b ghost" href="#/templates">템플릿 보기</a></div>
+  <div class="lp-cta"><button class="lp-b" data-gate>바로 시작하기</button><a class="lp-b ghost" href="/templates">템플릿 보기</a></div>
 </div></header>
 <section class="lp-feat">
   <h2>콘텐츠는 만들고 싶은데,<br>매번 디자인 앞에서 무너졌다면?</h2>
@@ -767,12 +780,12 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-
   <p class="lp-fh">더 궁금한 점은 인스타그램 <a href="https://www.instagram.com/cotton.224/" target="_blank" rel="noopener noreferrer">@cotton.224</a>로 편하게 물어봐 주세요.</p>
 </section>
 <section class="lp-end"><h2>나만의 생각을,<br>가장 나다운 콘텐츠로</h2><p>11월 7일까지 로그인하면 7일 무료 체험권을 드려요.</p><button class="lp-b" data-gate>바로 시작하기</button></section>
-<footer class="lp-foot"><a class="lp-brand" href="#/"><svg class="lp-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a><div class="lp-fl"><button type="button" class="lp-fnt" data-fonts>서체 라이선스</button><a href="https://www.instagram.com/cotton.224/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor"/></svg>cotton</a><a href="https://www.instagram.com/layered.club/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor"/></svg>layered club</a></div><div class="lp-fr2"><nav class="lp-lg2"><a href="#/terms">이용약관</a><a href="#/privacy">개인정보처리방침</a></nav><div class="lp-fi">마케팅 대행 및 문의: <a href="mailto:layered.mkt@gmail.com">layered.mkt@gmail.com</a></div><div class="lp-cr">© 2026 Layered Studio</div></div></footer>
+<footer class="lp-foot"><a class="lp-brand" href="/"><svg class="lp-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a><div class="lp-fl"><button type="button" class="lp-fnt" data-fonts>서체 라이선스</button><a href="https://www.instagram.com/cotton.224/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor"/></svg>cotton</a><a href="https://www.instagram.com/layered.club/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor"/></svg>layered club</a></div><div class="lp-fr2"><nav class="lp-lg2"><a href="/terms">이용약관</a><a href="/privacy">개인정보처리방침</a></nav><div class="lp-fi">마케팅 대행 및 문의: <a href="mailto:layered.mkt@gmail.com">layered.mkt@gmail.com</a></div><div class="lp-cr">© 2026 Layered Studio</div></div></footer>
 </div>
 
 <div class="pv" id="v-ws" hidden><div class="shell"><aside class="side" data-side="ws"></aside>
   <main class="wm">
-    <div class="wtop"><div class="sbox"><input id="wq" placeholder="워크스페이스 검색" aria-label="워크스페이스 검색"></div><span class="wspacer"></span><a class="btn sm" href="#/templates">템플릿 보러가기</a><button class="btn pri sm" data-new>+ 새로 만들기</button><span id="wpf"></span></div>
+    <div class="wtop"><div class="sbox"><input id="wq" placeholder="워크스페이스 검색" aria-label="워크스페이스 검색"></div><span class="wspacer"></span><a class="btn sm" href="/templates">템플릿 보러가기</a><button class="btn pri sm" data-new>+ 새로 만들기</button><span id="wpf"></span></div>
     <div class="whero"><h3>오늘은 어떤 콘텐츠를 만들어볼까요?</h3><div class="hbtns"><button data-start="blog:new">블로그형 만들기</button><button data-start="qna:new">질답형 만들기</button><button data-start="dict:new">사전형 만들기</button><button type="button" disabled>일반 텍스트형 만들기<span class="soonb">오픈 예정</span></button></div></div>
     <div class="wh"><h2>워크스페이스</h2><div class="wtools"><select id="wsort" aria-label="정렬"><option value="u">수정된 날짜</option><option value="n">이름순</option></select><div class="vt"><button data-wv="grid" class="on" title="카드로 보기" aria-label="카드로 보기">▦</button><button data-wv="list" title="목록으로 보기" aria-label="목록으로 보기">☰</button></div></div></div>
     <div class="chips" id="wf" style="margin:-6px 0 20px"></div><div class="grid" id="wg"></div></main></div></div>
@@ -784,9 +797,9 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-
   <main class="wm"><div class="wh"><h2>내 계정</h2></div><div id="acct"></div></main></div></div>
 
 <div class="pv" id="v-legal" hidden><div class="lg-w">
-  <a class="lp-brand lg-back" href="#/"><svg class="lp-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a>
+  <a class="lp-brand lg-back" href="/"><svg class="lp-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a>
   <h1 id="lg-t"></h1><div class="lg-sub" id="lg-s"></div><div class="lg-body" id="lg-b"></div>
-  <div class="lg-nav"><a href="#/terms">이용약관</a><a href="#/privacy">개인정보처리방침</a><a href="#/">홈으로</a></div>
+  <div class="lg-nav"><a href="/terms">이용약관</a><a href="/privacy">개인정보처리방침</a><a href="/">홈으로</a></div>
 </div></div>
 
 <div id="modal" class="modal" hidden><div class="mbox"><h3 id="mt"></h3><div id="mb"></div><div class="macts" id="ma"></div></div></div>
@@ -1781,38 +1794,44 @@ function detachCloud(){cloudId=null;lsSet('bse_cloud_id','')}
 const cloudAssets=new Set();
 function profileHTML(){
   const md=user.user_metadata||{},nm=md.full_name||md.name||(user.email||'').split('@')[0]||'내 계정',av=md.avatar_url||md.picture;
-  return '<div class="pfw"><button class="pfb" data-pfm aria-label="내 계정 메뉴" title="'+esc(nm)+'">'+(av?'<img src="'+esc(av)+'" alt="" referrerpolicy="no-referrer">':esc(nm.slice(0,1).toUpperCase()))+'</button><div class="pfm" hidden><div class="pfh"><b>'+esc(nm)+'</b><small>'+esc(user.email||'')+'</small></div><a href="#/account">내 계정</a><a href="#/workspace">워크스페이스</a><button data-pfout>로그아웃</button></div></div>';
+  return '<div class="pfw"><button class="pfb" data-pfm aria-label="내 계정 메뉴" title="'+esc(nm)+'">'+(av?'<img src="'+esc(av)+'" alt="" referrerpolicy="no-referrer">':esc(nm.slice(0,1).toUpperCase()))+'</button><div class="pfm" hidden><div class="pfh"><b>'+esc(nm)+'</b><small>'+esc(user.email||'')+'</small></div><a href="/account">내 계정</a><a href="/workspace">워크스페이스</a><button data-pfout>로그아웃</button></div></div>';
 }
 function paintAuth(){try{if(curView==='v-acct')renderAcct()}catch(e){}
-  const nr=document.querySelector('.lp-nr');if(nr)nr.innerHTML=user?profileHTML():'<a class="lp-tl" href="#/" data-login>로그인</a>';
+  const nr=document.querySelector('.lp-nr');if(nr)nr.innerHTML=user?profileHTML():'<a class="lp-tl" href="/" data-login>로그인</a>';
   const wp=$('#wpf');if(wp)wp.innerHTML=user?profileHTML():'';
   const b=$('#auth');b.textContent=user?((user.email||'내 계정').split('@')[0]):'로그인';b.title=user?user.email||'':'로그인'}
+function afterLogin(){
+  const pd=lsGet('bse_pending');lsSet('bse_pending','');
+  if(pd){const [pf,kind]=pd.split(':');startTemplate(pf,kind);return}
+  const af=lsGet('bse_after');lsSet('bse_after','');
+  nav((af&&/^\/(workspace|templates|account)$/.test(af))?af:'/workspace');
+}
 async function initAuth(){
-  if(!sb){return}
+  if(!sb){authReady=true;route();return}
   try{
     const r=await sb.auth.getSession();user=(r.data&&r.data.session&&r.data.session.user)||null;
-    if(user){cloudId=lsGet('bse_cloud_id')||null;trialInfo()}
-    paintAuth();
-    if(user&&/(access_token|refresh_token)=/.test(location.hash)){history.replaceState(null,'',location.pathname+'#/workspace');route()}
+    if(user){cloudId=lsGet('bse_cloud_id')||null;grantTrial()}
+    paintAuth();authReady=true;
+    if(user&&lsGet('bse_login')){lsSet('bse_login','');closeModal();afterLogin()}else route();
     sb.auth.onAuthStateChange((ev,sess)=>{
       const was=user;user=(sess&&sess.user)||null;paintAuth();
-      if(!was&&user){track('login_success');toast('로그인했어요');cloudId=lsGet('bse_cloud_id')||null;closeModal();grantTrial();const pd=lsGet('bse_pending');lsSet('bse_pending','');if(pd){const [pf,kind]=pd.split(':');startTemplate(pf,kind)}else location.hash='#/workspace'}
-      if(was&&!user){cloudAssets.clear()}
+      if(!was&&user){track('login_success');toast('로그인했어요');cloudId=lsGet('bse_cloud_id')||null;closeModal();grantTrial();lsSet('bse_login','');afterLogin()}
+      if(was&&!user){cloudAssets.clear();route()}
     });
-  }catch(e){}
+  }catch(e){authReady=true;route()}
 }
 const GSVG='<svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 01-2.2 3.3v2.7h3.6c2.1-1.9 3.2-4.8 3.2-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.3 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0012 23z"/><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 010-4.4V7H2.1a11 11 0 000 10z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 002.1 7l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
 /* 로그인 = 구글 로그인 창으로 바로 이동 (가입 단계 없음, 처음 로그인하면 자동 가입) */
 async function googleLogin(pend){
   if(!sb){toast('로그인 기능을 불러오지 못했어요. 인터넷 연결을 확인하세요');return}
   track('login_click');
-  if(pend)lsSet('bse_pending',pend);
-  const r=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});
+  if(pend)lsSet('bse_pending',pend);lsSet('bse_login','1');
+  const r=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/'}});
   if(r.error)toast('Google 로그인을 시작하지 못했어요')
 }
 /* 템플릿을 쓰려면 로그인이 필요해요: 무료 + 7일 체험권 안내 */
 function loginGate(pend){
-  modal('지금은 무료예요!','<p class="lgsub">무료로 로그인하고<br><b>7일 무료 체험권</b>을 받아가세요.<br>'+(pend?'로그인하면 고른 템플릿으로 바로 시작해요.':'로그인하면 워크스페이스에서 바로 시작해요.')+'</p><button class="lgb gg" id="lg-g">'+GSVG+'Google로 계속하기</button><p class="lgnote">처음 로그인하면 자동으로 가입돼요.<br>로그인하면 <a href="#/terms">이용약관</a>과 <a href="#/privacy">개인정보처리방침</a>에 동의하게 돼요.</p>',[{label:'닫기'}]);
+  modal('지금은 무료예요!','<p class="lgsub">무료로 로그인하고<br><b>7일 무료 체험권</b>을 받아가세요.<br>'+(pend?'로그인하면 고른 템플릿으로 바로 시작해요.':'로그인하면 워크스페이스에서 바로 시작해요.')+'</p><button class="lgb gg" id="lg-g">'+GSVG+'Google로 계속하기</button><p class="lgnote">처음 로그인하면 자동으로 가입돼요.<br>로그인하면 <a href="/terms">이용약관</a>과 <a href="/privacy">개인정보처리방침</a>에 동의하게 돼요.</p>',[{label:'닫기'}]);
   $('#lg-g').onclick=()=>googleLogin(pend);
 }
 /* 7일 무료 체험권: 로그인 때 한 번 시작해요 (이 브라우저에 기록. 계정별 서버 저장은 아직이에요) */
@@ -1836,7 +1855,7 @@ function renderAcct(){
    +'<div class="acc"><h4>7일 무료 체험</h4>'+(t.active?'<div class="acbig">'+t.left+'<small>일 남았어요</small></div><div class="acbar"><i style="width:'+pct+'%"></i></div><div class="acm">'+fmtD(t.start)+' 시작 · '+fmtD(t.end)+'까지</div>':'<div class="acbig" style="font-size:20px">체험 기간이 끝났어요</div><div class="acnote">지금은 모든 기능을 무료로 쓸 수 있어요. 유료 요금제는 준비 중이에요.</div>')+'<div class="acnote">체험 기록은 이 브라우저에 저장돼요.</div></div>'
    +'<div class="acc"><h4>계정</h4><div class="acrow"><span>요금제</span><span>'+(t.active?'무료 체험 중':'무료')+'</span></div><div class="acrow"><span>유료 요금제</span><span>준비 중</span></div><div class="acrow"><span>로그아웃</span><button class="btn sm" id="ac-out">로그아웃</button></div></div>'
    +'</div>';
-  $('#ac-out').onclick=async()=>{await sb.auth.signOut();toast('로그아웃했어요');location.hash='#/'}
+  $('#ac-out').onclick=async()=>{await sb.auth.signOut();toast('로그아웃했어요');nav('/')}
 }
 const blobOf=async u=>(await fetch(u)).blob();
 const toDataUrl=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
@@ -1889,7 +1908,12 @@ let edited=false;let draftId=null;try{draftId=localStorage.getItem('bse_draft_id
 const DB={open(){return new Promise((ok,no)=>{const r=indexedDB.open('bse_drafts',1);r.onupgradeneeded=()=>r.result.createObjectStore('d',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})},
   async tx(mode,fn){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction('d',mode),o=fn(t.objectStore('d'));t.oncomplete=()=>ok(o&&o.result);t.onerror=()=>no(t.error)})},
   put(v){return this.tx('readwrite',s=>s.put(v))},get(id){return this.tx('readonly',s=>s.get(id))},del(id){return this.tx('readwrite',s=>s.delete(id))},all(){return this.tx('readonly',s=>s.getAll())}};
+const isEmptyDoc=d=>{try{return !d.pages.some(p=>p.blocks.some(b=>(TEXT.includes(b.type)&&plain(b.html).replace(/[\u200B\s]/g,''))||(b.type==='image'&&(b.assetId||b.videoId))))}catch(e){return false}};
 async function draftSave(silent){
+  if(isEmptyDoc(doc)){
+    if(draftId){try{await DB.del(draftId)}catch(e){}draftId=null;lsSet('bse_draft_id','')}
+    edited=false;setSaved(true);if(!silent)toast('아직 저장할 내용이 없어요');return;
+  }
   try{
     if(!draftId){draftId='d_'+uid()+uid()}
     const now=Date.now();
@@ -1912,7 +1936,7 @@ async function draftList(){
   };
 }
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'){e.preventDefault();draftSave()}});
-$('#auth').addEventListener('click',()=>{user?location.hash='#/account':googleLogin()});
+$('#auth').addEventListener('click',()=>{user?nav('/account'):googleLogin()});
 
 /* ---------- 화면(홈 / 워크스페이스 / 템플릿 / 에디터) ---------- */
 const PFN={blog:'블로그형',qna:'질답형',dict:'사전형'};
@@ -1947,7 +1971,7 @@ TPLS.push({pf:'blog',kind:'post',name:'글 썸네일 · 이미지 위 제목'});
 function tplInfo(t){const m=makeTemplate(t.pf,t.kind);return Object.assign({},t,m,{pages:m.doc.pages.length})}
 async function startTemplate(pf,kind){
   const m=makeTemplate(pf,kind);applyDoc(m.doc,m.assets,null,m.videos);track('template_start',{pf,kind});
-  if(location.hash==='#/editor')route();else location.hash='#/editor';
+  nav('/editor');
 }
 function applyDoc(nd,na,id,nv){
   try{detachCloud()}catch(e){}
@@ -1959,7 +1983,7 @@ async function openDraft(id){
   const p=await DB.get(id);
   if(!p||!p.doc||!Array.isArray(p.doc.pages)||!p.doc.pages.length){toast('작업을 열지 못했어요');return}
   applyDoc(p.doc,p.assets,id,p.videos);track('draft_open');
-  if(location.hash==='#/editor')route();else location.hash='#/editor';
+  nav('/editor');
 }
 function ago(t){
   const m=Math.floor((Date.now()-t)/60000);
@@ -1967,8 +1991,8 @@ function ago(t){
   const d=Math.floor(h/24);if(d<7)return d+'일 전';return new Date(t).toLocaleDateString('ko-KR');
 }
 function sideHTML(active){
-  return '<a class="brand" href="#/"><svg class="lmg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a><button class="btn pri block" data-new>+ 새로 만들기</button>'
-   +'<nav><a class="ni'+(active==='ws'?' on':'')+'" href="#/workspace">워크스페이스</a><a class="ni'+(active==='tpl'?' on':'')+'" href="#/templates">템플릿</a><a class="ni'+(active==='acct'?' on':'')+'" href="#/account">내 계정</a></nav>'
+  return '<a class="brand" href="/"><svg class="lmg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="7" width="13" height="13" rx="3"/><path d="M8 4.5h9a3.5 3.5 0 013.5 3.5v9"/></svg>Layered Studio</a><button class="btn pri block" data-new>+ 새로 만들기</button>'
+   +'<nav><a class="ni'+(active==='ws'?' on':'')+'" href="/workspace">워크스페이스</a><a class="ni'+(active==='tpl'?' on':'')+'" href="/templates">템플릿</a><a class="ni'+(active==='acct'?' on':'')+'" href="/account">내 계정</a></nav>'
    ;
 }
 qa('[data-side]').forEach(a=>a.innerHTML=sideHTML(a.dataset.side));
@@ -1979,12 +2003,14 @@ async function renderWs(){
   $('#wf').innerHTML=chipsHTML(wsF);
   qa('[data-wv]').forEach(b=>b.classList.toggle('on',b.dataset.wv===wsV));
   let rows=[];try{rows=await DB.all()}catch(e){}
+  const empt=rows.filter(r=>r.doc&&isEmptyDoc(r.doc));
+  if(empt.length){for(const r of empt){try{await DB.del(r.id)}catch(e){}if(r.id===draftId){draftId=null;lsSet('bse_draft_id','')}}rows=rows.filter(r=>!empt.includes(r))}
   rows.sort(wsS==='n'?(a,b)=>String(a.title).localeCompare(String(b.title),'ko'):(a,b)=>b.updated-a.updated);
   if(wsF!=='all')rows=rows.filter(r=>r.platform===wsF);
   if(wsQ)rows=rows.filter(r=>String(r.title).toLowerCase().includes(wsQ.toLowerCase()));
   const g=$('#wg');g.innerHTML='';g.classList.toggle('list',wsV==='list');
   if(wsV==='grid'&&!wsQ){const nc=document.createElement('div');nc.className='newc';nc.dataset.new='1';nc.style.minHeight='200px';nc.innerHTML='<i>+</i>새로 만들기';g.appendChild(nc)}
-  if(!rows.length){const e=document.createElement('div');e.className='empty';e.innerHTML=wsQ?'<b>검색 결과가 없어요</b>다른 이름으로 찾아보세요.':'<b>아직 작업이 없어요</b>새로 만들거나 템플릿에서 시작해 보세요.<br><br><a class="btn pri" href="#/templates">템플릿 보기</a>';g.appendChild(e);return}
+  if(!rows.length){const e=document.createElement('div');e.className='empty';e.innerHTML=wsQ?'<b>검색 결과가 없어요</b>다른 이름으로 찾아보세요.':'<b>아직 작업이 없어요</b>새로 만들거나 템플릿에서 시작해 보세요.<br><br><a class="btn pri" href="/templates">템플릿 보기</a>';g.appendChild(e);return}
   rows.forEach(r=>{
     const c=document.createElement('div');c.className='wc';c.dataset.id=r.id;
     const th=document.createElement('div');th.className='th';th.dataset.open='1';th.appendChild(miniCard(r.doc,r.assets,0,wsV==='list'?52:170,r.videos));
@@ -2150,12 +2176,26 @@ function renderLegal(path){
   $('#lg-t').textContent=d.title;$('#lg-s').textContent='시행일 '+LEGAL_DATE;$('#lg-b').innerHTML=d.html;
   document.title=d.title+' · Layered Studio';
 }
-let curView='';
+let curView='';let authReady=false;
+const NAVP=['/','/workspace','/templates','/editor','/account'];
+function nav(path,replace){
+  if(location.pathname===path&&!location.hash){route();return}
+  history[replace?'replaceState':'pushState'](null,'',path);route();
+}
+const GUARDED=['v-ws','v-tpl','v-editor'];
 function fitZoom(){const sg=$('#stage');st.zoom=Math.max(.25,Math.min(1,(sg.clientHeight-48)/H,(sg.clientWidth-48)/W));applyZoom()}
 const VIEWS={'/':'v-home','/workspace':'v-ws','/templates':'v-tpl','/account':'v-acct','/terms':'v-legal','/privacy':'v-legal','/editor':'v-editor'};
 function route(){
-  const p=(location.hash.replace(/^#/,'')||'/').split('?')[0];
-  const id=VIEWS[p]||'v-home';
+  const hm=/^#(\/[a-z]*)/.exec(location.hash);  /* 예전 #/workspace 링크는 /workspace 로 바꿔요 */
+  if(hm){history.replaceState(null,'',hm[1]+location.search)}
+  const p=location.pathname.replace(/\/+$/,'')||'/';
+  let id=VIEWS[p]||'v-home';
+  if(GUARDED.includes(id)&&!user){
+    if(!authReady)return;
+    lsSet('bse_after',p);history.replaceState(null,'','/');id='v-home';
+    setTimeout(()=>{if(!user)loginGate('')},60);
+  }
+  if(id==='v-home'&&p!=='/')history.replaceState(null,'','/');
   if(curView==='v-editor'&&id!=='v-editor'&&edited)draftSave(true);
   qa('.view,.pv').forEach(v=>v.hidden=v.id!==id);
   curView=id;if(id!=='v-editor'){const v=$('#'+id);if(v)v.scrollTop=0}
@@ -2167,22 +2207,23 @@ function route(){
   if(id==='v-editor')requestAnimationFrame(fitZoom);
   track('view',{v:id.slice(2)});
 }
-window.addEventListener('hashchange',route);
+window.addEventListener('popstate',route);window.addEventListener('hashchange',route);
 $('#wq').addEventListener('input',e=>{wsQ=e.target.value.trim();renderWs()});
 $('#wsort').addEventListener('change',e=>{wsS=e.target.value;renderWs()});
 window.addEventListener('resize',()=>{if(curView==='v-editor')fitZoom()});
 document.addEventListener('click',async e=>{
   const t=e.target;
   if(!t.closest('.pfw'))qa('.pfm').forEach(x=>x.hidden=true);
-  if(t.closest('#modal a[href^="#/"]'))closeModal();
+  if(t.closest('#modal a[href^="/"]'))closeModal();
+  const al=t.closest('a[href^="/"]');if(al&&!al.hasAttribute('data-login')&&!al.hasAttribute('data-gate')&&!al.hasAttribute('data-start')&&NAVP.includes(al.getAttribute('href'))&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&e.button===0){e.preventDefault();nav(al.getAttribute('href'));return}
   if(t.closest('[data-fonts]')){fontsModal();return}
   const pm=t.closest('[data-pfm]');if(pm){const m=pm.nextElementSibling,was=m.hidden;qa('.pfm').forEach(x=>x.hidden=true);m.hidden=!was;return}
   if(t.closest('.pfm a'))qa('.pfm').forEach(x=>x.hidden=true);
-  if(t.closest('[data-pfout]')){qa('.pfm').forEach(x=>x.hidden=true);try{await sb.auth.signOut()}catch(err){}toast('로그아웃했어요');location.hash='#/';return}
-  const sc=t.closest('[data-start]');if(sc){const [pf,kind]=sc.dataset.start.split(':');if(!user&&kind!=='new'&&kind!=='blank'){loginGate(sc.dataset.start);return}if(sc.hasAttribute('data-login')&&!user){loginGate(sc.dataset.start);return}closeModal();track('start_click',{pf,kind});startTemplate(pf,kind);return}
-  const gt=t.closest('[data-gate]');if(gt){e.preventDefault();if(user)location.hash='#/workspace';else loginGate('');return}
-  const lgn=t.closest('[data-login]');if(lgn){e.preventDefault();if(user)location.hash='#/workspace';else googleLogin();return}
-  if(t.closest('[data-new]')){startTemplate('blog','blank');return}
+  if(t.closest('[data-pfout]')){qa('.pfm').forEach(x=>x.hidden=true);try{await sb.auth.signOut()}catch(err){}toast('로그아웃했어요');nav('/');return}
+  const sc=t.closest('[data-start]');if(sc){const [pf,kind]=sc.dataset.start.split(':');if(!user){loginGate(sc.dataset.start);return}closeModal();track('start_click',{pf,kind});startTemplate(pf,kind);return}
+  const gt=t.closest('[data-gate]');if(gt){e.preventDefault();if(user)nav('/workspace');else loginGate('');return}
+  const lgn=t.closest('[data-login]');if(lgn){e.preventDefault();if(user)nav('/workspace');else googleLogin();return}
+  if(t.closest('[data-new]')){if(!user){loginGate('blog:blank');return}startTemplate('blog','blank');return}
   const fr=t.closest('[data-frame]');if(fr){chooseFrame(fr.dataset.frame);return}
   if(t.closest('[data-pkall]')){const c=qa('#mb .pk input');const all=c.every(x=>x.checked);c.forEach(x=>x.checked=!all);return}
   const wv=t.closest('[data-wv]');if(wv){wsV=wv.dataset.wv;renderWs();return}
@@ -2217,9 +2258,10 @@ function initLanding(){
     };
     const go=i=>{prog=Date.now()+900;show(i);tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'})};
     const tick=()=>{clearTimeout(timer);if(!auto||!vis)return;timer=setTimeout(()=>{go((idx+1)%HOLD.length);tick()},HOLD[idx])};
-    const stop=()=>{auto=false;clearTimeout(timer)};
+    const stop=()=>{clearTimeout(timer);timer=setTimeout(()=>{if(vis)tick()},6000)};
     tr.addEventListener('scroll',()=>{clearTimeout(tr._t);tr._t=setTimeout(()=>{const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));if(i!==idx){show(i);if(Date.now()>prog)stop()}},90)});
-    ['pointerdown','wheel','touchstart'].forEach(ev=>tr.addEventListener(ev,stop,{passive:true}));
+    ['pointerdown','touchstart'].forEach(ev=>tr.addEventListener(ev,stop,{passive:true}));
+    tr.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))stop()},{passive:true});
     tabs.forEach(t=>t.addEventListener('click',()=>{stop();go(+t.dataset.jj)}));
     snd.addEventListener('click',()=>{stop();vid.muted=!vid.muted;snd.textContent=vid.muted?'소리 켜기':'소리 끄기';if(!vid.muted)vid.play().catch(()=>{})});
     if('IntersectionObserver' in window)new IntersectionObserver(es=>{vis=es.some(x=>x.isIntersecting);if(vis){loadVid();show(idx);tick()}else{clearTimeout(timer);vid.pause()}},{threshold:.35}).observe(card);
@@ -2267,12 +2309,9 @@ initPick();
   }catch(e){}
   initAuth();
   try{track('app_open',{ref:document.referrer?new URL(document.referrer).hostname:'',utm:new URLSearchParams(location.search).get('utm_source')||'',returning:rows.length>0})}catch(e){}
-  const h=location.hash;
+  const h=location.hash,pth=location.pathname.replace(/\/+$/,'')||'/';
   const last=()=>rows.slice().sort((a,b)=>(b.id===lsGet('bse_draft_id'))-(a.id===lsGet('bse_draft_id'))||b.updated-a.updated)[0];
-  if(!h||h==='#'){
-    if(rows.length){const p=last();applyDoc(p.doc,p.assets,p.id);history.replaceState(null,'','#/editor')}
-    else history.replaceState(null,'','#/');
-  }else if(h==='#/editor'){
+  if(pth==='/editor'||h==='#/editor'){
     if(rows.length){const p=last();applyDoc(p.doc,p.assets,p.id)}else{const m=makeTemplate('blog','blank');applyDoc(m.doc,m.assets,null)}
   }
   if(!doc){const m=makeTemplate('blog','blank');applyDoc(m.doc,m.assets,null)}
