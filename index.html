@@ -1787,33 +1787,26 @@ function paintAuth(){try{if(curView==='v-acct')renderAcct()}catch(e){}
   const nr=document.querySelector('.lp-nr');if(nr)nr.innerHTML=user?profileHTML():'<a class="lp-tl" href="#/" data-login>로그인</a>';
   const wp=$('#wpf');if(wp)wp.innerHTML=user?profileHTML():'';
   const b=$('#auth');b.textContent=user?((user.email||'내 계정').split('@')[0]):'로그인';b.title=user?user.email||'':'로그인'}
-function afterLogin(){
-  const pd=lsGet('bse_pending');lsSet('bse_pending','');
-  if(pd){const [pf,kind]=pd.split(':');startTemplate(pf,kind);return}
-  const af=lsGet('bse_after');lsSet('bse_after','');
-  location.hash=(af&&/^#\/(workspace|templates|account)/.test(af))?af:'#/workspace';
-  if(location.hash===(af||'#/workspace'))route();
-}
 async function initAuth(){
-  if(!sb){authReady=true;route();return}
+  if(!sb){return}
   try{
     const r=await sb.auth.getSession();user=(r.data&&r.data.session&&r.data.session.user)||null;
-    if(user){cloudId=lsGet('bse_cloud_id')||null;grantTrial()}
-    paintAuth();authReady=true;
-    if(user&&lsGet('bse_login')){lsSet('bse_login','');closeModal();afterLogin()}else route();
+    if(user){cloudId=lsGet('bse_cloud_id')||null;trialInfo()}
+    paintAuth();
+    if(user&&/(access_token|refresh_token)=/.test(location.hash)){history.replaceState(null,'',location.pathname+'#/workspace');route()}
     sb.auth.onAuthStateChange((ev,sess)=>{
       const was=user;user=(sess&&sess.user)||null;paintAuth();
-      if(!was&&user){track('login_success');toast('로그인했어요');cloudId=lsGet('bse_cloud_id')||null;closeModal();grantTrial();lsSet('bse_login','');afterLogin()}
-      if(was&&!user){cloudAssets.clear();route()}
+      if(!was&&user){track('login_success');toast('로그인했어요');cloudId=lsGet('bse_cloud_id')||null;closeModal();grantTrial();const pd=lsGet('bse_pending');lsSet('bse_pending','');if(pd){const [pf,kind]=pd.split(':');startTemplate(pf,kind)}else location.hash='#/workspace'}
+      if(was&&!user){cloudAssets.clear()}
     });
-  }catch(e){authReady=true;route()}
+  }catch(e){}
 }
 const GSVG='<svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 01-2.2 3.3v2.7h3.6c2.1-1.9 3.2-4.8 3.2-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.3 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0012 23z"/><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 010-4.4V7H2.1a11 11 0 000 10z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 002.1 7l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
 /* 로그인 = 구글 로그인 창으로 바로 이동 (가입 단계 없음, 처음 로그인하면 자동 가입) */
 async function googleLogin(pend){
   if(!sb){toast('로그인 기능을 불러오지 못했어요. 인터넷 연결을 확인하세요');return}
   track('login_click');
-  if(pend)lsSet('bse_pending',pend);lsSet('bse_login','1');
+  if(pend)lsSet('bse_pending',pend);
   const r=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});
   if(r.error)toast('Google 로그인을 시작하지 못했어요')
 }
@@ -1896,12 +1889,7 @@ let edited=false;let draftId=null;try{draftId=localStorage.getItem('bse_draft_id
 const DB={open(){return new Promise((ok,no)=>{const r=indexedDB.open('bse_drafts',1);r.onupgradeneeded=()=>r.result.createObjectStore('d',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})},
   async tx(mode,fn){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction('d',mode),o=fn(t.objectStore('d'));t.oncomplete=()=>ok(o&&o.result);t.onerror=()=>no(t.error)})},
   put(v){return this.tx('readwrite',s=>s.put(v))},get(id){return this.tx('readonly',s=>s.get(id))},del(id){return this.tx('readwrite',s=>s.delete(id))},all(){return this.tx('readonly',s=>s.getAll())}};
-const isEmptyDoc=d=>{try{return !d.pages.some(p=>p.blocks.some(b=>(TEXT.includes(b.type)&&plain(b.html).replace(/[\u200B\s]/g,''))||(b.type==='image'&&(b.assetId||b.videoId))))}catch(e){return false}};
 async function draftSave(silent){
-  if(isEmptyDoc(doc)){
-    if(draftId){try{await DB.del(draftId)}catch(e){}draftId=null;lsSet('bse_draft_id','')}
-    edited=false;setSaved(true);if(!silent)toast('아직 저장할 내용이 없어요');return;
-  }
   try{
     if(!draftId){draftId='d_'+uid()+uid()}
     const now=Date.now();
@@ -1991,8 +1979,6 @@ async function renderWs(){
   $('#wf').innerHTML=chipsHTML(wsF);
   qa('[data-wv]').forEach(b=>b.classList.toggle('on',b.dataset.wv===wsV));
   let rows=[];try{rows=await DB.all()}catch(e){}
-  const empt=rows.filter(r=>r.doc&&isEmptyDoc(r.doc));
-  if(empt.length){for(const r of empt){try{await DB.del(r.id)}catch(e){}if(r.id===draftId){draftId=null;lsSet('bse_draft_id','')}}rows=rows.filter(r=>!empt.includes(r))}
   rows.sort(wsS==='n'?(a,b)=>String(a.title).localeCompare(String(b.title),'ko'):(a,b)=>b.updated-a.updated);
   if(wsF!=='all')rows=rows.filter(r=>r.platform===wsF);
   if(wsQ)rows=rows.filter(r=>String(r.title).toLowerCase().includes(wsQ.toLowerCase()));
@@ -2164,18 +2150,12 @@ function renderLegal(path){
   $('#lg-t').textContent=d.title;$('#lg-s').textContent='시행일 '+LEGAL_DATE;$('#lg-b').innerHTML=d.html;
   document.title=d.title+' · Layered Studio';
 }
-let curView='';let authReady=false;
-const GUARDED=['v-ws','v-tpl','v-editor'];
+let curView='';
 function fitZoom(){const sg=$('#stage');st.zoom=Math.max(.25,Math.min(1,(sg.clientHeight-48)/H,(sg.clientWidth-48)/W));applyZoom()}
 const VIEWS={'/':'v-home','/workspace':'v-ws','/templates':'v-tpl','/account':'v-acct','/terms':'v-legal','/privacy':'v-legal','/editor':'v-editor'};
 function route(){
   const p=(location.hash.replace(/^#/,'')||'/').split('?')[0];
-  let id=VIEWS[p]||'v-home';
-  if(GUARDED.includes(id)&&!user){
-    if(!authReady)return;
-    lsSet('bse_after',location.hash||'');history.replaceState(null,'','#/');id='v-home';
-    setTimeout(()=>{if(!user)loginGate('')},60);
-  }
+  const id=VIEWS[p]||'v-home';
   if(curView==='v-editor'&&id!=='v-editor'&&edited)draftSave(true);
   qa('.view,.pv').forEach(v=>v.hidden=v.id!==id);
   curView=id;if(id!=='v-editor'){const v=$('#'+id);if(v)v.scrollTop=0}
@@ -2199,10 +2179,10 @@ document.addEventListener('click',async e=>{
   const pm=t.closest('[data-pfm]');if(pm){const m=pm.nextElementSibling,was=m.hidden;qa('.pfm').forEach(x=>x.hidden=true);m.hidden=!was;return}
   if(t.closest('.pfm a'))qa('.pfm').forEach(x=>x.hidden=true);
   if(t.closest('[data-pfout]')){qa('.pfm').forEach(x=>x.hidden=true);try{await sb.auth.signOut()}catch(err){}toast('로그아웃했어요');location.hash='#/';return}
-  const sc=t.closest('[data-start]');if(sc){const [pf,kind]=sc.dataset.start.split(':');if(!user){loginGate(sc.dataset.start);return}closeModal();track('start_click',{pf,kind});startTemplate(pf,kind);return}
+  const sc=t.closest('[data-start]');if(sc){const [pf,kind]=sc.dataset.start.split(':');if(!user&&kind!=='new'&&kind!=='blank'){loginGate(sc.dataset.start);return}if(sc.hasAttribute('data-login')&&!user){loginGate(sc.dataset.start);return}closeModal();track('start_click',{pf,kind});startTemplate(pf,kind);return}
   const gt=t.closest('[data-gate]');if(gt){e.preventDefault();if(user)location.hash='#/workspace';else loginGate('');return}
   const lgn=t.closest('[data-login]');if(lgn){e.preventDefault();if(user)location.hash='#/workspace';else googleLogin();return}
-  if(t.closest('[data-new]')){if(!user){loginGate('blog:blank');return}startTemplate('blog','blank');return}
+  if(t.closest('[data-new]')){startTemplate('blog','blank');return}
   const fr=t.closest('[data-frame]');if(fr){chooseFrame(fr.dataset.frame);return}
   if(t.closest('[data-pkall]')){const c=qa('#mb .pk input');const all=c.every(x=>x.checked);c.forEach(x=>x.checked=!all);return}
   const wv=t.closest('[data-wv]');if(wv){wsV=wv.dataset.wv;renderWs();return}
@@ -2237,10 +2217,9 @@ function initLanding(){
     };
     const go=i=>{prog=Date.now()+900;show(i);tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'})};
     const tick=()=>{clearTimeout(timer);if(!auto||!vis)return;timer=setTimeout(()=>{go((idx+1)%HOLD.length);tick()},HOLD[idx])};
-    const stop=()=>{clearTimeout(timer);timer=setTimeout(()=>{if(vis)tick()},6000)};
+    const stop=()=>{auto=false;clearTimeout(timer)};
     tr.addEventListener('scroll',()=>{clearTimeout(tr._t);tr._t=setTimeout(()=>{const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));if(i!==idx){show(i);if(Date.now()>prog)stop()}},90)});
-    ['pointerdown','touchstart'].forEach(ev=>tr.addEventListener(ev,stop,{passive:true}));
-    tr.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))stop()},{passive:true});
+    ['pointerdown','wheel','touchstart'].forEach(ev=>tr.addEventListener(ev,stop,{passive:true}));
     tabs.forEach(t=>t.addEventListener('click',()=>{stop();go(+t.dataset.jj)}));
     snd.addEventListener('click',()=>{stop();vid.muted=!vid.muted;snd.textContent=vid.muted?'소리 켜기':'소리 끄기';if(!vid.muted)vid.play().catch(()=>{})});
     if('IntersectionObserver' in window)new IntersectionObserver(es=>{vis=es.some(x=>x.isIntersecting);if(vis){loadVid();show(idx);tick()}else{clearTimeout(timer);vid.pause()}},{threshold:.35}).observe(card);
@@ -2291,7 +2270,8 @@ initPick();
   const h=location.hash;
   const last=()=>rows.slice().sort((a,b)=>(b.id===lsGet('bse_draft_id'))-(a.id===lsGet('bse_draft_id'))||b.updated-a.updated)[0];
   if(!h||h==='#'){
-    history.replaceState(null,'','#/');
+    if(rows.length){const p=last();applyDoc(p.doc,p.assets,p.id);history.replaceState(null,'','#/editor')}
+    else history.replaceState(null,'','#/');
   }else if(h==='#/editor'){
     if(rows.length){const p=last();applyDoc(p.doc,p.assets,p.id)}else{const m=makeTemplate('blog','blank');applyDoc(m.doc,m.assets,null)}
   }
