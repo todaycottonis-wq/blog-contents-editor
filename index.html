@@ -1772,6 +1772,7 @@ async function renderToBlob(p,fontCSS,warm){
   if(fontCSS)opt.fontEmbedCSS=fontCSS;
   try{if(warm)await htmlToImage.toBlob(n,opt);return await htmlToImage.toBlob(n,opt)}finally{h.removeChild(n)}
 }
+let EXAC=null;
 const VMIMES=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9,opus','video/webm'];
 function drawSlot(cx,v,sl){
   const vw=v.videoWidth,vh=v.videoHeight;if(!vw||!vh)return;
@@ -1790,22 +1791,44 @@ async function renderVideoBlob(p,fontCSS,prog){
   let bgBlob;try{await htmlToImage.toBlob(n,opt);bgBlob=await htmlToImage.toBlob(n,opt)}finally{h.removeChild(n)}
   const bg=await createImageBitmap(bgBlob);
   const vids=await Promise.all(slots.map(sl=>new Promise((ok,no)=>{
-    const v=document.createElement('video');v.src=vidURL(sl.id);v.playsInline=true;v.preload='auto';v.style.cssText='position:fixed;left:0;bottom:0;width:48px;height:48px;opacity:.02;pointer-events:none;z-index:-1';document.body.appendChild(v);
-    v.muted=!!sl.mute;v.onloadeddata=()=>ok(v);v.onerror=()=>no(new Error('동영상을 읽지 못했어요'));
+    const v=document.createElement('video');v.src=vidURL(sl.id);v.playsInline=true;v.preload='auto';v.style.cssText='position:fixed;left:0;bottom:0;width:160px;height:90px;opacity:.02;pointer-events:none;z-index:-1';document.body.appendChild(v);
+    v.muted=true;v.defaultMuted=true;v.onloadeddata=()=>ok(v);v.onerror=()=>no(new Error('동영상을 읽지 못했어요'));
   })));
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d');
-  const stream=cv.captureStream(30);let ac=null;
-  try{ac=new (window.AudioContext||window.webkitAudioContext)();const dest=ac.createMediaStreamDestination();vids.forEach((v,i)=>{if(!slots[i].mute)ac.createMediaElementSource(v).connect(dest)});dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t))}catch(e){ac=null;vids.forEach((v,i)=>{if(slots[i].mute||!v.captureStream)return;try{v.captureStream().getAudioTracks().forEach(t=>stream.addTrack(t))}catch(e2){}})}
+  const stream=cv.captureStream(30);let ac=null,srcs=[];
+  const diag={vdur:vids.map(v=>+v.duration.toFixed(2)),mute:slots.map(x=>x.mute?1:0)};
+  if(slots.some(x=>!x.mute)&&(window.AudioContext||window.webkitAudioContext)){
+    try{
+      ac=EXAC||new (window.AudioContext||window.webkitAudioContext)();
+      if(ac.state!=='running')await Promise.race([ac.resume().catch(()=>{}),new Promise(r=>setTimeout(r,600))]);
+      diag.acState=ac.state;
+      if(ac.state!=='running')ac=null;  /* 소리를 못 쓰면 영상만 저장 (멈추지 않게) */
+    }catch(e){ac=null}
+    if(ac){
+      const dest=ac.createMediaStreamDestination();
+      for(let i=0;i<vids.length;i++){
+        if(slots[i].mute)continue;
+        try{
+          const ab=await (await fetch(vidURL(slots[i].id))).arrayBuffer();
+          const buf=await ac.decodeAudioData(ab);
+          const sn=ac.createBufferSource();sn.buffer=buf;sn.connect(dest);srcs.push(sn);
+        }catch(e){diag.audioErr=String(e&&e.message||e).slice(0,60)}
+      }
+      if(srcs.length)dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+      else ac=null;
+    }
+  }
+  diag.audio=srcs.length;
   const mime=VMIMES.find(m=>MediaRecorder.isTypeSupported(m))||'';
   const rec=new MediaRecorder(stream,Object.assign({videoBitsPerSecond:6e6},mime?{mimeType:mime}:{})),chunks=[];
   rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
   const stopped=new Promise(res=>rec.onstop=res);
   const dur=Math.min(Math.max(...vids.map(v=>v.duration)),VID_MAX_SEC+1);
   const draw=()=>{cx.drawImage(bg,0,0);slots.forEach((sl,i)=>drawSlot(cx,vids[i],sl))};
-  draw();rec.start(500);
+  draw();diag.t0=performance.now();rec.start(500);
   try{
-    if(ac&&ac.state==='suspended')await ac.resume();
     await Promise.all(vids.map(v=>{v.currentTime=0;return v.play()}));
+    srcs.forEach(sn=>{try{sn.start()}catch(e){}});
     await new Promise(res=>{
       const w0=performance.now();let lastT=-1,lastMove=w0;
       const tick=()=>{
@@ -1819,13 +1842,17 @@ async function renderVideoBlob(p,fontCSS,prog){
     await new Promise(r=>setTimeout(r,250));
   }finally{
     if(rec.state!=='inactive')rec.stop();await stopped;
-    vids.forEach(v=>{v.pause();v.remove()});try{ac&&ac.close()}catch(e){}
+    srcs.forEach(sn=>{try{sn.stop()}catch(e){}});
+    diag.tEnd=+Math.max(...vids.map(v=>v.currentTime)).toFixed(2);diag.ended=vids.every(v=>v.ended)?1:0;diag.wall=+((performance.now()-diag.t0)/1000).toFixed(1);
+    vids.forEach(v=>{v.pause();v.remove()});
   }
   const type=(rec.mimeType||mime||'video/webm').split(';')[0];
+  delete diag.t0;diag.dur=+dur.toFixed(2);diag.mime=type;try{track('video_export',diag)}catch(e){}
   return{blob:new Blob(chunks,{type}),ext:/mp4/.test(type)?'mp4':'webm'};
 }
 async function exportPages(idxs){
   const t0=Date.now();track('export_click',{scope:idxs.length>1?'all':'current',pages:idxs.length});
+  try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){EXAC=new AC();if(EXAC.resume)EXAC.resume().catch(()=>{})}}catch(e){EXAC=null}
   if(!window.htmlToImage||!window.JSZip){toast('내보내기 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인하세요');return}
   modal('내보내는 중','<p id="mp">폰트와 이미지를 확인하고 있어요…</p>',[]);
   const prog=t=>{const e=$('#mp');if(e)e.textContent=t};
@@ -1855,7 +1882,7 @@ async function exportPages(idxs){
   }catch(err){
     console.error(err);track('export_fail',{msg:String(err&&err.message||err).slice(0,80)});
     modal('내보내기에 실패했어요','<p>'+esc(err&&err.message||String(err))+'</p>',[{label:'닫기'}]);
-  }
+  }finally{try{EXAC&&EXAC.close()}catch(e){}EXAC=null}
 }
 
 
